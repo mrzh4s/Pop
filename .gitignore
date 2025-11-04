@@ -6,6 +6,7 @@ public/assets/vendors
 storage/framework
 storage/logs
 storage/cache
+apps_old
 .env
 .npmrc
 *.min.js

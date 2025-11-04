@@ -1,3 +1,3 @@
-# e-app
+# Hoper Framework
 
-All New APP Backbone
+Simple and Straight Forward Framework
