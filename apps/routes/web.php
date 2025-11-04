@@ -3,50 +3,40 @@
 // ============== ROOT ROUTES ==============
 $router->get('/', function() {
 
-    if (session_has('user.id') || is_cookie_authenticated()) {
-        header("Location: ".session('user.intended_url') ?? 'dashboard', true, 302);
+    if (session('authenticated')) {
+        header("Location: home", true, 302);
     } else {
         redirect('auth.signin');
     }
 
-})->name('home');
+})->name('root');
 
 
 // Load authentication routes
-require_once 'web/auth.php';
+$router->get('/auth/signin', 'LoginPage@show', ['guest'])
+    ->name('auth.signin');
 
-// Load dashboard routes
-require_once 'web/dashboard.php';
+// You can also add register page
+$router->get('/auth/register', 'RegisterPage@show', ['guest'])
+    ->name('auth.register');
 
-// Load project routes
-require_once 'web/projects.php';
 
-// Load geospatial routes
-require_once 'web/geospatial.php';
+// Load home routes
+$router->get('/home', 'HomePage@show', ['auth'])->name('home');
 
-// Load survey routes
-require_once 'web/surveys.php';
+// Load Applications routes
+$router->get('/applications/create', 'application/CreatePage@show', ['auth'])->name('applications.create');
+$router->get('/applications/migrate', 'application/MigratePage@show', ['auth'])->name('applications.migrate');
+$router->get('/applications/migrate/new/{id:number}', 'application/migrate/NewPage@show', ['auth'])->name('applications.migrate.new');
 
-// Load letter routes
-require_once 'web/letters.php';
 
-// Load calendar routes
-require_once 'web/calendar.php';
+// Load Error routes
+// 404 Error Page
+$router->get('/error/404', function($params) {
+    return view('error.404', $params);
+}, ['public']);
 
-// Load task routes
-require_once 'web/tasks.php';
-
-// Load report routes
-require_once 'web/reports.php';
-
-// Load tracker routes
-require_once 'web/tracker.php';
-
-// Load account routes
-require_once 'web/account.php';
-
-// Load utility routes (attachments, QR codes, etc.)
-require_once 'web/utilities.php';
-
-// Load error routes
-require_once 'web/errors.php';
+// 505 Error Page
+$router->get('/error/505', function($params) {
+    return view('error.505', $params);
+}, ['public']);

@@ -1,6 +1,6 @@
 <?php
 /**
- * Main routes.php - Entry point for all APP routes
+ * Main routes.php - Entry point for all KITER routes
  * Loads all route modules organized by functionality
  */
 
@@ -12,8 +12,6 @@ $router = new router();
 $router->middleware('auth', 'authMiddleware');
 $router->middleware('public', 'publicMiddleware');
 $router->middleware('guest', 'guestMiddleware');    
-$router->middleware('admin', 'adminMiddleware');
-$router->middleware('csrf', 'csrfMiddleware');
 
 
 

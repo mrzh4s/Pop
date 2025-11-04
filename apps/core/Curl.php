@@ -7,12 +7,10 @@
 
 class Curl {
     private static $instance = null;
-    private $traffic;
     private $defaultTimeout = 30;
-    private $defaultUserAgent = 'APP/1.0';
+    private $defaultUserAgent = 'KITER/1.0';
 
     private function __construct() {
-        $this->traffic = Traffic::getInstance();
     }
 
     /**
@@ -81,9 +79,6 @@ class Curl {
             }
 
             $result = $this->buildResponse($url, $data, $method, $headers, $response, $httpCode, $curlInfo);
-            
-            // Log traffic
-            $this->logTraffic($result);
             
             return $result;
 
@@ -199,43 +194,6 @@ class Curl {
         ];
     }
 
-    /**
-     * Log traffic
-     */
-    private function logTraffic($result) {
-        try {
-            $this->traffic->requestAPI(
-                $result['traffic'],
-                $result['url'],
-                $result['request_method'],
-                $result['headers'],
-                $result['body'],
-                $result['response'],
-                $result['status']
-            );
-        } catch (Exception $e) {
-            error_log("Traffic logging error: " . $e->getMessage());
-        }
-    }
-
-    /**
-     * Handle callback logging (legacy support)
-     */
-    public function callback($url, $headers, $body, $response = null, $method = 'POST', $status = false) {
-        try {
-            $cleanBody = str_replace(["\n", " "], "", json_encode(json_decode($body), JSON_UNESCAPED_SLASHES));
-            $parsed = parse_url($url);
-            $requestURL = $parsed['scheme'] . '://' . $parsed['host'];
-            $appUrl = parse_url(config('app.url'))['scheme'] . '://' . parse_url(config('app.url'))['host'];
-            
-            $traffic = ($appUrl == $requestURL) ? 'inbound' : 'outbound';
-            
-            return $this->traffic->requestAPI($traffic, $url, $method, $headers, $cleanBody, $response, $status);
-        } catch (Exception $e) {
-            error_log("Curl callback error: " . $e->getMessage());
-            return false;
-        }
-    }
 
     /**
      * Make GET request

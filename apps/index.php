@@ -1,9 +1,5 @@
 <?php
 
-// Set error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 // Define global root path
 define('ROOT_PATH', realpath($_SERVER['DOCUMENT_ROOT']));
 

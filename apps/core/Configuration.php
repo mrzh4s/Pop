@@ -48,11 +48,6 @@ class Configuration {
         if (class_exists('Session')) {
             $this->session = Session::getInstance();
         }
-        
-        // Initialize Permission if available  
-        if (class_exists('Permission')) {
-            $this->permission = Permission::getInstance();
-        }
     }
     
     /**
@@ -110,8 +105,8 @@ class Configuration {
         
         // App configuration
         $this->config['app'] = array_merge($this->config['app'] ?? [], [
-            'name' => $env->get('APP_NAME', 'APP'),
-            'title' => $env->get('APP_TITLE', $env->get('APP_NAME', 'APP')),
+            'name' => $env->get('APP_NAME', 'KITER'),
+            'title' => $env->get('APP_TITLE', $env->get('APP_NAME', 'KITER')),
             'version' => $env->get('APP_VERSION', '1.0.0'),
             'environment' => $env->get('APP_ENV', $env->get('APP_STATE', 'production')),
             'debug' => $env->get('APP_DEBUG', false),
@@ -121,47 +116,46 @@ class Configuration {
             'tenant' => $env->get('APP_TENANT', ''),
             'secret_key' => $env->get('APP_SECRET_KEY', $env->get('SECRET_KEY', ''))
         ]);
+
+        // Main configuration
+        $this->config['main'] = array_merge($this->config['main'] ?? [], [
+            'db' => $env->get('APP_DB', 'database/app.db')
+        ]);
         
-        // Database configuration
-        $this->config['db'] = array_merge($this->config['db'] ?? [], [
-            'host' => $env->get('DB_HOST', 'localhost'),
-            'port' => $env->get('DB_PORT', '5432'),
-            'database' => $env->get('DB_DATABASE', 'app'),
-            'username' => $env->get('DB_USERNAME', 'postgres'),
-            'password' => $env->get('DB_PASSWORD', ''),
-            'driver' => $env->get('DB_DRIVER', 'pgsql'),
-            'charset' => $env->get('DB_CHARSET', 'utf8'),
-            'prefix' => $env->get('DB_PREFIX', '')
+        // Source Database configuration
+        $this->config['source'] = array_merge($this->config['source'] ?? [], [
+            'host' => $env->get('SOURCE_DB_HOST', 'localhost'),
+            'port' => $env->get('SOURCE_DB_PORT', '5432'),
+            'database' => $env->get('SOURCE_DB_DATABASE', 'kiter'),
+            'username' => $env->get('SOURCE_DB_USERNAME', 'postgres'),
+            'password' => $env->get('SOURCE_DB_PASSWORD', ''),
+            'driver' => $env->get('SOURCE_DB_DRIVER', 'pgsql'),
+        ]);
+
+        // Destination Database configuration
+        $this->config['dest'] = array_merge($this->config['dest'] ?? [], [
+            'host' => $env->get('DEST_DB_HOST', 'localhost'),
+            'port' => $env->get('DEST_DB_PORT', '5432'),
+            'database' => $env->get('DEST_DB_DATABASE', 'kiter'),
+            'username' => $env->get('DEST_DB_USERNAME', 'postgres'),
+            'password' => $env->get('DEST_DB_PASSWORD', ''),
+            'driver' => $env->get('DEST_DB_DRIVER', 'pgsql'),
         ]);
         
         // FTP configuration
         $this->config['ftp'] = array_merge($this->config['ftp'] ?? [], [
-            'host' => $env->get('FTP_HOST', ''),
-            'port' => $env->get('FTP_PORT', '21'),
-            'username' => $env->get('FTP_USERNAME', ''),
-            'password' => $env->get('FTP_PASSWORD', ''),
-            'path' => $env->get('FTP_PATH', '')
+            'host' => $env->get('DEST_FTP_HOST', ''),
+            'port' => $env->get('DEST_FTP_PORT', '21'),
+            'username' => $env->get('DEST_FTP_USERNAME', ''),
+            'password' => $env->get('DEST_FTP_PASSWORD', ''),
+            'path' => $env->get('DEST_FTP_PATH', '')
         ]);
-        
-        // Telegram configuration
-        $this->config['telegram'] = array_merge($this->config['telegram'] ?? [], [
-            'bot_token' => $env->get('TELEGRAM_BOT_TOKEN', ''),
-            'bot_name' => $env->get('TELEGRAM_BOT_NAME', ''),
-            'chat_id' => $env->get('TELEGRAM_CHAT_ID', '')
-        ]);
-        
-        // GeoServer configuration
-        $this->config['geoserver'] = array_merge($this->config['geoserver'] ?? [], [
-            'layer' => $env->get('GEOSERVER_LAYER', ''),
-            'url' => $env->get('GEOSERVER_URL', ''),
-            'username' => $env->get('GEOSERVER_USERNAME', ''),
-            'password' => $env->get('GEOSERVER_PASSWORD', '')
-        ]);
-        
-        // Client configuration
-        $this->config['client'] = array_merge($this->config['client'] ?? [], [
-            'url' => $this->normalizeUrl($env->get('CLIENT_URL', '')),
-            'secret_key' => $env->get('CLIENT_SECRET_KEY', $env->get('SECRET_KEY', ''))
+
+        // Gravity Forms API configuration
+        $this->config['gf'] = array_merge($this->config['gf'] ?? [], [
+            'url' => $env->get('GF_API_URL', ''),
+            'key' => $env->get('GF_CONSUMER_KEY', ''),
+            'secret' => $env->get('GF_CONSUMER_SECRET', '')
         ]);
     }
     
@@ -259,11 +253,11 @@ class Configuration {
         
         return (object) [
             'App' => (object) $this->group('app'),
-            'Database' => (object) $this->group('db'),
+            'Main' => (object) $this->group('main'),
+            'GF' => (object) $this->group('gf'),
+            'Source' => (object) $this->group('source'),
+            'Dest' => (object) $this->group('dest'),
             'FTP' => (object) $this->group('ftp'),
-            'Telegram' => (object) $this->group('telegram'),
-            'GeoServer' => (object) $this->group('geoserver'),
-            'Client' => (object) $this->group('client')
         ];
     }
     
@@ -301,13 +295,6 @@ class Configuration {
     }
     
     /**
-     * Check permission (proxy to Permission)
-     */
-    public function can($permission, $value = null, $attribute = null, $attributeValue = null) {
-        return $this->permission ? $this->permission->can($permission, $value, $attribute, $attributeValue) : false;
-    }
-    
-    /**
      * Get session value (proxy to Session)
      */
     public function session($key = null, $default = null) {
@@ -340,7 +327,6 @@ class Configuration {
             'components' => [
                 'environment' => $this->environment ? 'loaded' : 'not loaded',
                 'session' => $this->session ? 'loaded' : 'not loaded', 
-                'permission' => $this->permission ? 'loaded' : 'not loaded'
             ]
         ];
     }

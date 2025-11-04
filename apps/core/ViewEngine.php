@@ -1,6 +1,6 @@
 <?php
 /**
- * AUTO-DISCOVERY ViewEngine for APP 
+ * AUTO-DISCOVERY ViewEngine for KITER 
  * File: apps/core/ViewEngine.php
  * 
  * New Features:
@@ -24,7 +24,7 @@ class ViewEngine {
     
     public function __construct() {
         $this->viewPaths = [
-            ROOT_PATH . '/views/',
+            ROOT_PATH . '/templates/',
             ROOT_PATH . '/components/'
         ];
         

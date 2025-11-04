@@ -9,6 +9,8 @@
 if (!function_exists('view')) {
     function view($view, $data = []) {
         if (class_exists('ViewEngine')) {
+            global $currentView;
+            $currentView = $view;
             try {
                 $engine = ViewEngine::getInstance();
                 return $engine->render($view, $data);
@@ -120,6 +122,40 @@ if (!function_exists('view_share')) {
     }
 }
 
+if(!function_exists('partial')) {
+    function partial($name, $value = []) {
+        global $currentView;
+        if (!empty($currentView)) {
+            // Convert dot notation to path (applications.migrate.new -> applications/migrate/new)
+            $viewPath = str_replace('.', '/', $currentView);
+            $viewDir = dirname($viewPath);
+            
+            // If dirname returns '.' it means no subdirectory, skip to global fallback
+            if ($viewDir !== '.') {
+                $path = ROOT_PATH . '/templates/' . $viewDir . '/partials/' . $name . '.php';
+                if (file_exists($path)) {
+                    extract($value, EXTR_SKIP);
+                    ob_start();
+                    include $path;
+                    return ob_get_clean();
+                }
+            }
+        }
+        
+        // Fallback to root partials
+        $path = ROOT_PATH . '/templates/partials/' . $name . '.php';
+        if (file_exists($path)) {
+            extract($value, EXTR_SKIP);
+            ob_start();
+            include $path;
+            return ob_get_clean();
+        }
+        
+        error_log("Partial not found: {$name} (View: {$currentView})");
+        return '';
+    }
+}
+
 // ============== GLOBAL ASSET HELPER FUNCTIONS ==============
 
 /**
@@ -139,19 +175,12 @@ if (!function_exists('asset')) {
         return $url;
     }
 }
-
-if (!function_exists('media')) {
-    function media (string $path ) {
-        return asset('media'). '/'. $path;
-    }
-}
-
 /**
  * Generate image URL with alt text support
  */
 if (!function_exists('img')) {
-    function img($src, $alt = '', $attributes = []) {
-        $url = media($src).'';
+    function img($src,$attributes = [], $alt = '') {
+        $src = asset('images/' . ltrim($src, '/'));
         $alt = htmlspecialchars($alt);
         
         // Build attributes string
@@ -160,7 +189,7 @@ if (!function_exists('img')) {
             $attrs .= ' ' . $key . '="' . htmlspecialchars($value) . '"';
         }
         
-        return '<img src="' . $url . '" alt="' . $alt . '"' . $attrs . '>';
+        return '<img src="' . $src . '" alt="' . $alt . '"' . $attrs . '>';
     }
 }
 
@@ -168,16 +197,16 @@ if (!function_exists('img')) {
  * Generate CSS link tag
  */
 if (!function_exists('css')) {
-    function css($path, $media = 'all', $attributes = []) {
+    function css($path,$attributes = []) {
         $url = asset($path);
         
         // Build attributes string
-        $attrs = '';
+        $attrs = 'type="text/css"';
         foreach ($attributes as $key => $value) {
             $attrs .= ' ' . $key . '="' . htmlspecialchars($value) . '"';
         }
         
-        return '<link rel="stylesheet" href="' . $url . '" media="' . $media . '"' . $attrs . ' />';
+        return '<link rel="stylesheet" href="' . $url . '"' . $attrs . ' />';
     }
 }
 
@@ -233,260 +262,5 @@ if (!function_exists('favicon')) {
 if (!function_exists('meta')) {
     function meta($name, $content, $type = 'name') {
         return '<meta ' . $type . '="' . htmlspecialchars($name) . '" content="' . htmlspecialchars($content) . '">';
-    }
-}
-
-/**
- * Generate link tag
- */
-if (!function_exists('link_tag')) {
-    function link_tag($href, $rel = 'stylesheet', $attributes = []) {
-        $url = strpos($href, 'http') === 0 ? $href : asset($href);
-        
-        // Build attributes string
-        $attrs = '';
-        foreach ($attributes as $key => $value) {
-            $attrs .= ' ' . $key . '="' . htmlspecialchars($value) . '"';
-        }
-        
-        return '<link rel="' . $rel . '" href="' . $url . '"' . $attrs . '>';
-    }
-}
-
-
-
-// ============== PURE PHP PERMISSION HELPER FUNCTIONS ==============
-
-/**
- * Check if user can perform action - outputs opening PHP if tag
- */
-if (!function_exists('if_can')) {
-    function if_can($permission, $value = null, $attribute = null, $attributeValue = null) {
-        if (function_exists('can') && can($permission, $value, $attribute, $attributeValue)) {
-            echo '<!-- if_can: true -->';
-            return true;
-        }
-        echo '<!-- if_can: false -->';
-        return false;
-    }
-}
-
-/**
- * Check if user cannot perform action
- */
-if (!function_exists('if_cannot')) {
-    function if_cannot($permission, $value = null, $attribute = null, $attributeValue = null) {
-        if (function_exists('cannot') && cannot($permission, $value, $attribute, $attributeValue)) {
-            echo '<!-- if_cannot: true -->';
-            return true;
-        }
-        echo '<!-- if_cannot: false -->';
-        return false;
-    }
-}
-
-/**
- * Check if user has role
- */
-if (!function_exists('if_role')) {
-    function if_role($role) {
-        if (function_exists('can') && can('role', $role)) {
-            echo '<!-- if_role: true -->';
-            return true;
-        }
-        echo '<!-- if_role: false -->';
-        return false;
-    }
-}
-
-/**
- * Check if user is authenticated
- */
-if (!function_exists('if_auth')) {
-    function if_auth() {
-        if (!empty(session('username'))) {
-            echo '<!-- if_auth: true -->';
-            return true;
-        }
-        echo '<!-- if_auth: false -->';
-        return false;
-    }
-}
-
-/**
- * Check if user is guest
- */
-if (!function_exists('if_guest')) {
-    function if_guest() {
-        if (empty(session('username'))) {
-            echo '<!-- if_guest: true -->';
-            return true;
-        }
-        echo '<!-- if_guest: false -->';
-        return false;
-    }
-}
-
-/**
- * Check if user is in department
- */
-if (!function_exists('if_department')) {
-    function if_department($department) {
-        if (function_exists('can') && can('department', $department, 'department', $department)) {
-            echo "<!-- if_department: true ({$department}) -->";
-            return true;
-        }
-        echo "<!-- if_department: false ({$department}) -->";
-        return false;
-    }
-}
-
-/**
- * Check if user is in location
- */
-if (!function_exists('if_location')) {
-    function if_location($location) {
-        if (function_exists('can') && can('location', null, 'location', $location)) {
-            echo "<!-- if_location: true ({$location}) -->";
-            return true;
-        }
-        echo "<!-- if_location: false ({$location}) -->";
-        return false;
-    }
-}
-
-/**
- * Show content only to specific role
- */
-if (!function_exists('show_if_role')) {
-    function show_if_role($role, $content) {
-        if (function_exists('can') && can('role', $role)) {
-            echo $content;
-        }
-    }
-}
-
-/**
- * Show content only to specific department
- */
-if (!function_exists('show_if_department')) {
-    function show_if_department($department, $content) {
-        if (function_exists('can') && can('department', $department, 'department', $department)) {
-            echo $content;
-        }
-    }
-}
-
-/**
- * Show content only to authenticated users
- */
-if (!function_exists('show_if_auth')) {
-    function show_if_auth($content) {
-        if (!empty(session('username'))) {
-            echo $content;
-        }
-    }
-}
-
-/**
- * Show content only to guests
- */
-if (!function_exists('show_if_guest')) {
-    function show_if_guest($content) {
-        if (empty(session('username'))) {
-            echo $content;
-        }
-    }
-}
-
-/**
- * Render content based on multiple conditions (AND logic)
- */
-if (!function_exists('show_if_all')) {
-    function show_if_all($conditions, $content) {
-        $canShow = true;
-        
-        foreach ($conditions as $condition) {
-            $type = $condition['type'] ?? 'role';
-            $value = $condition['value'] ?? null;
-            $attribute = $condition['attribute'] ?? null;
-            $attributeValue = $condition['attributeValue'] ?? null;
-            
-            switch ($type) {
-                case 'role':
-                    if (!function_exists('can') || !can('role', $value)) {
-                        $canShow = false;
-                        break 2;
-                    }
-                    break;
-                case 'department':
-                    if (!function_exists('can') || !can('department', $value, 'department', $value)) {
-                        $canShow = false;
-                        break 2;
-                    }
-                    break;
-                case 'location':
-                    if (!function_exists('can') || !can('location', null, 'location', $value)) {
-                        $canShow = false;
-                        break 2;
-                    }
-                    break;
-                case 'auth':
-                    if (empty(session('username'))) {
-                        $canShow = false;
-                        break 2;
-                    }
-                    break;
-            }
-        }
-        
-        if ($canShow) {
-            echo $content;
-        }
-    }
-}
-
-/**
- * Render content based on multiple conditions (OR logic)
- */
-if (!function_exists('show_if_any')) {
-    function show_if_any($conditions, $content) {
-        $canShow = false;
-        
-        foreach ($conditions as $condition) {
-            $type = $condition['type'] ?? 'role';
-            $value = $condition['value'] ?? null;
-            
-            switch ($type) {
-                case 'role':
-                    if (function_exists('can') && can('role', $value)) {
-                        $canShow = true;
-                        break 2;
-                    }
-                    break;
-                case 'department':
-                    if (function_exists('can') && can('department', $value, 'department', $value)) {
-                        $canShow = true;
-                        break 2;
-                    }
-                    break;
-                case 'location':
-                    if (function_exists('can') && can('location', null, 'location', $value)) {
-                        $canShow = true;
-                        break 2;
-                    }
-                    break;
-                case 'auth':
-                    if (!empty(session('username'))) {
-                        $canShow = true;
-                        break 2;
-                    }
-                    break;
-            }
-        }
-        
-        if ($canShow) {
-            echo $content;
-        }
     }
 }

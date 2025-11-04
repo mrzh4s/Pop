@@ -32,7 +32,7 @@ if(!defined('APP_DEBUG')) {
 /**
  * Enhanced Bootstrap Class with Full Auto-Discovery
  */
-class APPBootstrap {
+class Bootstrap {
     private static $loadedClasses = [];
     private static $loadedServices = [];
     private static $loadedHelpers = [];
@@ -43,30 +43,23 @@ class APPBootstrap {
         'Environment',      // Environment variables
         'Configuration',    // Configuration management
         'Session',         // Session management
-        'Cookie',          // Cookie management
         'Security',        // CSRF and security
-        'Permission',      // Permissions system
         
         // Database and connections
-        'DBFactory',       // Database connections
+        'Connection',       // Database connections
         
         // Application components
         'ViewEngine',      // View rendering
         'Router',          // Routing system
         
-        // Optional utilities
-        'Activity',        // Activity logging
-        'Traffic',         // API traffic monitoring
+    
         'Curl',           // HTTP client
-        'Utilities',      // General utilities
     ];
     
     // Service load order (after core classes)
     private static $serviceLoadOrder = [
-        'UserService',
-        'EmailService',
-        'TelegramService',
         // Add more services as needed
+        'GravityFormService'
     ];
     
     // Helper files load order (dependency-aware)
@@ -74,21 +67,15 @@ class APPBootstrap {
         'env',           // Environment helpers first
         'config',        // Configuration helpers
         'session',       // Session helpers
-        'cookie',        // Cookie helpers 
         'security',      // Security helpers (CSRF, etc)
-        'permission',    // Permission helpers
         'connection',    // Database connection helpers
         'http',          // HTTP/Curl helpers
-        'activity',      // Activity logging helpers
-        'traffic',       // Traffic monitoring helpers
-        'utils',         // Utility helpers
         'router',        // Routing helpers
         'view',          // View/Asset helpers
     ];
     
     private static $serviceHelperOrder = [
-        'user',          // User management helpers
-        'notification',  // Email/Telegram helpers
+        'gravityform'
     ];
     
     /**
@@ -157,8 +144,7 @@ class APPBootstrap {
         } else {
             // Some classes are optional
             $optional = [
-                'Utilities', 'TelegramBot', 'Activity', 
-                'Traffic', 'ViewEngine', 'Router'
+                'ViewEngine', 'Router'
             ];
             
             if (in_array($className, $optional)) {
@@ -373,15 +359,11 @@ class APPBootstrap {
                 'app_url' => function_exists('app_url') ? app_url() : '',
                 'is_local' => function_exists('is_local') ? is_local() : false,
                 'is_debug' => function_exists('app_debug') ? app_debug() : false,
-                'current_user' => function_exists('session') ? session('username') : null,
-                'current_role' => function_exists('session') ? session('role') : null,
-                'current_department' => function_exists('session') ? session('department') : null,
-                'csrf_token' => function_exists('csrf_token') ? csrf_token() : null,
             ];
             
             $viewEngine->share($sharedData);
             
-            if (defined('APP_DEBUG') && APP_DEBUG) {
+            if (defined('APP_DEBUG')) {
                 error_log("APP: ViewEngine initialized with framework data");
             }
             
@@ -511,7 +493,7 @@ class APPBootstrap {
 }
 
 // Execute bootstrap
-APPBootstrap::boot();
+Bootstrap::boot();
 
 // ============== GLOBAL HELPER FUNCTIONS FOR BOOTSTRAP ==============
 
@@ -529,7 +511,7 @@ if (!function_exists('APP_status')) {
      * Get comprehensive bootstrap status
      */
     function APP_status() {
-        return APPBootstrap::getStatus();
+        return Bootstrap::getStatus();
     }
 }
 
@@ -538,7 +520,7 @@ if (!function_exists('APP_has_helper')) {
      * Check if specific helper is loaded
      */
     function APP_has_helper($helperName, $type = null) {
-        return APPBootstrap::hasHelper($helperName, $type);
+        return Bootstrap::hasHelper($helperName, $type);
     }
 }
 
@@ -547,7 +529,7 @@ if (!function_exists('APP_helpers')) {
      * Get loaded helpers grouped by type
      */
     function APP_helpers() {
-        return APPBootstrap::getLoadedHelpers();
+        return Bootstrap::getLoadedHelpers();
     }
 }
 
@@ -556,7 +538,7 @@ if (!function_exists('APP_services')) {
      * Get loaded services
      */
     function APP_services() {
-        return APPBootstrap::getLoadedServices();
+        return Bootstrap::getLoadedServices();
     }
 }
 
@@ -565,6 +547,6 @@ if (!function_exists('APP_load_service')) {
      * Dynamically load a service
      */
     function APP_load_service($serviceName) {
-        return APPBootstrap::loadService($serviceName);
+        return Bootstrap::loadService($serviceName);
     }
 }

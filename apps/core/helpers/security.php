@@ -22,7 +22,7 @@ if (!function_exists('csrf_verify')) {
         if ($token === null) {
             $token = Security::getCSRFTokenFromRequest();
         }
-        
+
         if (!$token) {
             return false;
         }

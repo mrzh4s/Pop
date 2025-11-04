@@ -12,7 +12,7 @@
 
 // Extract data with defaults
 $icon = $data['icon'] ?? 'question-mark';
-$variant = $data['variant'] ?? 'fas';
+$variant = $data['variant'] ?? 'fad';
 $class = $data['class'] ?? '';
 $title = $data['title'] ?? '';
 $attributes = $data['attributes'] ?? [];

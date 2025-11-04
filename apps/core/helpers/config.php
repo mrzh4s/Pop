@@ -64,7 +64,7 @@ if (!function_exists('app')) {
 
 if (!function_exists('app_name')) {
     function app_name() {
-        return config('app.name', 'APP');
+        return config('app.name', 'KITER');
     }
 }
 
@@ -143,77 +143,48 @@ if (!function_exists('app_debug')) {
 // ============== SERVICE CONFIG HELPERS ==============
 
 if (!function_exists('db_config')) {
-    function db_config($key = null) {
-        if ($key === null) {
-            return Configuration::getInstance()->group('db');
-        }
-        return config("db.$key");
+    function db_config() {
+        $config = Configuration::getInstance();
+        return $config->get("app.db");
+    }
+}
+
+if (!function_exists('gf_config')) {
+    function gf_config($key) {
+        $config = Configuration::getInstance();
+        return $config->get("gf.{$key}");
     }
 }
 
 if (!function_exists('ftp_config')) {
-    function ftp_config($key = null) {
-        if ($key === null) {
-            return Configuration::getInstance()->group('ftp');
-        }
-        return config("ftp.$key");
+    function ftp_config($key) {
+        $config = Configuration::getInstance();
+        return $config->get("ftp.{$key}");
     }
 }
 
-if (!function_exists('telegram_config')) {
-    function telegram_config($key = null) {
-        if ($key === null) {
-            return Configuration::getInstance()->group('telegram');
-        }
-        return config("telegram.$key");
+if (!function_exists('sqlite_config')) {
+    function sqlite_config() {
+        $config = Configuration::getInstance();
+        return $config->get('app.db', 'database/app.db');
     }
 }
 
-if (!function_exists('geoserver_config')) {
-    function geoserver_config($key = null) {
-        if ($key === null) {
-            return Configuration::getInstance()->group('geoserver');
-        }
-        return config("geoserver.$key");
+// Destination DB (PostgreSQL)
+if (!function_exists('dest_db_config')) {
+    function dest_db_config($key) {
+        $config = Configuration::getInstance();
+        return $config->get("dest.{$key}");
     }
 }
 
-if (!function_exists('client_config')) {
-    function client_config($key = null) {
-        if ($key === null) {
-            return Configuration::getInstance()->group('client');
-        }
-        return config("client.$key");
+if (!function_exists('source_db_config')) {
+    function source_db_config($key) {
+        $config = Configuration::getInstance();
+        return $config->get("source.{$key}");
     }
 }
 
-// ============== SESSION HELPER FUNCTIONS (replaces System.php) ==============
-
-if (!function_exists('session')) {
-    function session($key = null, $default = null) {
-        return Configuration::getInstance()->session($key, $default);
-    }
-}
-
-if (!function_exists('session_set')) {
-    function session_set($key, $value) {
-        return Configuration::getInstance()->setSession($key, $value);
-    }
-}
-
-// ============== PERMISSION HELPER FUNCTIONS (replaces System.php) ==============
-
-if (!function_exists('can')) {
-    function can($permission, $value = null, $attribute = null, $attributeValue = null) {
-        return Configuration::getInstance()->can($permission, $value, $attribute, $attributeValue);
-    }
-}
-
-if (!function_exists('cannot')) {
-    function cannot($permission, $value = null, $attribute = null, $attributeValue = null) {
-        return !can($permission, $value, $attribute, $attributeValue);
-    }
-}
 
 // ============== DEBUG HELPERS (replaces System.php) ==============
 
