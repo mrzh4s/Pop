@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Terengganu_flag" width="1e3" height="500" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+  <defs id="defs">
+    <clipPath id="a">
+      <path id="path414" d="m0 0h1133.88v566.88h-1133.88z" clip-rule="evenodd"/>
+    </clipPath>
+    <clipPath id="b">
+      <path id="path417" d="m0 566.88h1133.88v-566.88l-1133.88-0" clip-rule="evenodd"/>
+    </clipPath>
+  </defs>
+  <g id="g1" transform="matrix(.881927 0 0 -.882021 0 500)" clip-path="url(#a)">
+    <path id="path1" d="m0 0h1133.88v566.88h-1133.88z" fill="#000000" fill-rule="evenodd"/>
+  </g>
+  <path id="path2" d="m583.372 166.409v63.8558l60.835 19.7355-60.835 19.7355v63.8558l-37.606-51.659-60.8351 19.7267 37.5972-51.659-37.5972-51.659 60.8351 19.7267zm-94.0107-50.0567c9.21982 0 18.2208 0.93687 26.9152 2.71429l1.95254 0.49908-10.8134 1.65484c-59.8632 12.2581-104.894 65.2567-104.894 128.78 0 63.5231 45.0309 116.522 104.894 128.78l10.8134 1.65485-1.95254 0.49907c-8.69448 1.77743-17.6954 2.71429-26.9152 2.71429-73.7673 0-133.569-59.8369-133.569-133.648 0-73.8111 59.8019-133.648 133.569-133.648z" fill="#ffffff" fill-rule="evenodd"/>
+  <g id="g2" transform="matrix(.881927 0 0 -.882021 0 500)" clip-path="url(#b)">
+    <path id="path3" d="m94.033 472.85v-378.816h945.817v378.816zm-93.9707 94.03h1133.82v-566.88h-1133.88v566.88z" fill="#ffffff" fill-rule="evenodd"/>
+  </g>
+</svg>
