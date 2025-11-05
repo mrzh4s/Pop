@@ -38,8 +38,8 @@ class Activity {
         // Get location info with error handling
         $locationInfo = $this->getLocationInfo($ip);
 
-        $query = "INSERT INTO log.user_activities 
-            (user_id, ip_address, url, location, device, message, action_at) 
+        $query = "INSERT INTO user_activities
+            (user_id, ip_address, url, location, device, message, action_at)
             VALUES (:user, :ip, :url, :location, :device, :message, :timestamp)";
 
         $stmt = $conn->prepare($query);
@@ -94,8 +94,8 @@ class Activity {
         try {
             $conn = db();
             
-            $query = "SELECT * FROM log.user_activities WHERE user_id = :userId
-                     ORDER BY action_at DESC 
+            $query = "SELECT * FROM user_activities WHERE user_id = :userId
+                     ORDER BY action_at DESC
                      LIMIT :limit";
                      
             $stmt = $conn->prepare($query);
@@ -119,7 +119,7 @@ class Activity {
             $conn = db();
             $timestamp = date('Y-m-d H:i:s');
 
-            $query = "INSERT INTO sys_record_changelog (system_id, current_flow, flow_timestamp, username, details";
+            $query = "INSERT INTO project_activities (system_id, current_flow, flow_timestamp, username, details";
             $query .= $authorityId !== null ? ", authority" : "";
             $query .= ") VALUES (:system_id, :currentFlow, :timestamp, :username, :details";
             $query .= $authorityId !== null ? ", :authority" : "";
@@ -151,8 +151,8 @@ class Activity {
         try {
             $conn = db();
             
-            $query = "SELECT * FROM sys_record_changelog 
-                     WHERE system_id = :systemId 
+            $query = "SELECT * FROM project_activities
+                     WHERE system_id = :systemId
                      ORDER BY flow_timestamp DESC";
                      
             $stmt = $conn->prepare($query);

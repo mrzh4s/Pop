@@ -28,7 +28,7 @@ class Traffic {
         try {
             $conn = db();
             
-            $query = "SELECT * FROM sys_api_traffic";
+            $query = "SELECT * FROM api_traffic";
             $params = [];
             $conditions = [];
 
@@ -95,8 +95,8 @@ class Traffic {
         try {
             $conn = db();
             
-            $query = "INSERT INTO sys_api_traffic (traffic, url, method, headers, body, response, status, created_at) 
-                     VALUES (:traffic, :url, :method, :headers, :body, :response, :status, NOW())";
+            $query = "INSERT INTO api_traffic (traffic, url, method, headers, body, response, status, created_at)
+                     VALUES (:traffic, :url, :method, :headers, :body, :response, :status, CURRENT_TIMESTAMP)";
             
             $stmt = $conn->prepare($query);
             $stmt->bindParam(':traffic', $traffic);
@@ -130,7 +130,7 @@ class Traffic {
                         status,
                         COUNT(*) as count,
                         AVG(CASE WHEN response_time IS NOT NULL THEN response_time END) as avg_response_time
-                      FROM sys_api_traffic 
+                      FROM api_traffic
                       WHERE {$dateCondition}
                       GROUP BY traffic, method, status
                       ORDER BY count DESC";
@@ -153,9 +153,9 @@ class Traffic {
         try {
             $conn = db();
             
-            $query = "SELECT * FROM sys_api_traffic 
+            $query = "SELECT * FROM api_traffic
                      WHERE status IN ('error', 'false', 'failed')
-                     ORDER BY created_at DESC 
+                     ORDER BY created_at DESC
                      LIMIT :limit";
             
             $stmt = $conn->prepare($query);
@@ -177,9 +177,9 @@ class Traffic {
         try {
             $conn = db();
             
-            $query = "SELECT * FROM sys_api_traffic 
-                     WHERE url LIKE :endpoint 
-                     ORDER BY created_at DESC 
+            $query = "SELECT * FROM api_traffic
+                     WHERE url LIKE :endpoint
+                     ORDER BY created_at DESC
                      LIMIT :limit";
             
             $stmt = $conn->prepare($query);
@@ -202,8 +202,8 @@ class Traffic {
         try {
             $conn = db();
             
-            $query = "DELETE FROM sys_api_traffic 
-                     WHERE created_at < DATE_SUB(NOW(), INTERVAL :days DAY)";
+            $query = "DELETE FROM api_traffic
+                     WHERE created_at < datetime('now', '-' || :days || ' days')";
             
             $stmt = $conn->prepare($query);
             $stmt->bindValue(':days', (int)$daysToKeep, PDO::PARAM_INT);
@@ -254,25 +254,25 @@ class Traffic {
     private function buildDateCondition($period) {
         switch ($period) {
             case '1h':
-                return "created_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR)";
+                return "created_at >= datetime('now', '-1 hour')";
             case '24h':
             case '1d':
-                return "created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)";
+                return "created_at >= datetime('now', '-1 day')";
             case '7d':
             case '1w':
-                return "created_at >= DATE_SUB(NOW(), INTERVAL 1 WEEK)";
+                return "created_at >= datetime('now', '-7 days')";
             case '30d':
             case '1m':
-                return "created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)";
+                return "created_at >= datetime('now', '-30 days')";
             default:
-                return "created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)";
+                return "created_at >= datetime('now', '-1 day')";
         }
     }
 
     private function getTotalRequests() {
         try {
             $conn = db();
-            $stmt = $conn->prepare("SELECT COUNT(*) FROM sys_api_traffic");
+            $stmt = $conn->prepare("SELECT COUNT(*) FROM api_traffic");
             $stmt->execute();
             return (int)$stmt->fetchColumn();
         } catch (Exception $e) {
@@ -283,7 +283,7 @@ class Traffic {
     private function getTodayRequests() {
         try {
             $conn = db();
-            $stmt = $conn->prepare("SELECT COUNT(*) FROM sys_api_traffic WHERE DATE(created_at) = CURDATE()");
+            $stmt = $conn->prepare("SELECT COUNT(*) FROM api_traffic WHERE DATE(created_at) = DATE('now')");
             $stmt->execute();
             return (int)$stmt->fetchColumn();
         } catch (Exception $e) {
@@ -297,11 +297,11 @@ class Traffic {
             $stmt = $conn->prepare("
                 SELECT 
                     ROUND(
-                        (COUNT(CASE WHEN status IN ('error', 'false', 'failed') THEN 1 END) / COUNT(*)) * 100, 
+                        (COUNT(CASE WHEN status IN ('error', 'false', 'failed') THEN 1 END) / COUNT(*)) * 100,
                         2
-                    ) as error_rate 
-                FROM sys_api_traffic 
-                WHERE created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)
+                    ) as error_rate
+                FROM api_traffic
+                WHERE created_at >= datetime('now', '-1 day')
             ");
             $stmt->execute();
             return (float)$stmt->fetchColumn();
@@ -318,10 +318,10 @@ class Traffic {
                     url,
                     COUNT(*) as request_count,
                     AVG(CASE WHEN status = 'success' THEN 1 ELSE 0 END) * 100 as success_rate
-                FROM sys_api_traffic 
-                WHERE created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)
-                GROUP BY url 
-                ORDER BY request_count DESC 
+                FROM api_traffic
+                WHERE created_at >= datetime('now', '-1 day')
+                GROUP BY url
+                ORDER BY request_count DESC
                 LIMIT :limit
             ");
             $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);

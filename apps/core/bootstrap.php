@@ -43,17 +43,22 @@ class Bootstrap {
         'Environment',      // Environment variables
         'Configuration',    // Configuration management
         'Session',         // Session management
+        'Cookie',          // Cookie management
         'Security',        // CSRF and security
-        
+
         // Database and connections
         'Connection',       // Database connections
-        
+        'Migration',       // Database migrations
+
+        // Authorization and logging
+        'Permission',      // Permission system
+        'Activity',        // Activity logging
+        'Traffic',         // API traffic logging
+
         // Application components
         'ViewEngine',      // View rendering
         'Router',          // Routing system
-        
-    
-        'Curl',           // HTTP client
+        'Curl',            // HTTP client
     ];
     
     // Service load order (after core classes)
@@ -67,11 +72,17 @@ class Bootstrap {
         'env',           // Environment helpers first
         'config',        // Configuration helpers
         'session',       // Session helpers
+        'cookie',        // Cookie helpers
         'security',      // Security helpers (CSRF, etc)
         'connection',    // Database connection helpers
+        'migration',     // Migration helpers
+        'permission',    // Permission helpers
+        'activity',      // Activity logging helpers
+        'traffic',       // Traffic logging helpers
         'http',          // HTTP/Curl helpers
         'router',        // Routing helpers
         'view',          // View/Asset helpers
+        'debug',         // Debug helpers
     ];
     
     private static $serviceHelperOrder = [
@@ -103,10 +114,13 @@ class Bootstrap {
             
             // 7. Initialize framework
             self::initializeFramework();
-            
-            // 8. Initialize view engine
+
+            // 8. Run auto-migrations
+            self::runAutoMigrations();
+
+            // 9. Initialize view engine
             self::initializeViewEngine();
-            
+
             // Mark as loaded
             define('APP_CORE_LOADED', true);
             
@@ -334,12 +348,35 @@ class Bootstrap {
     private static function initializeFramework() {
         // Configuration handles core system initialization
         $config = Configuration::getInstance();
-        
+
         if (defined('APP_DEBUG')) {
             error_log("APP: Framework initialized via Configuration class");
         }
     }
-    
+
+    /**
+     * Run automatic database migrations
+     */
+    private static function runAutoMigrations() {
+        if (!class_exists('Migration')) {
+            if (defined('APP_DEBUG')) {
+                error_log("APP: Migration class not available - skipping auto-migrations");
+            }
+            return;
+        }
+
+        try {
+            Migration::autoRun();
+
+            if (defined('APP_DEBUG')) {
+                error_log("APP: Auto-migration check completed");
+            }
+        } catch (Exception $e) {
+            error_log("APP: Auto-migration error: " . $e->getMessage());
+            // Don't stop bootstrap for migration errors
+        }
+    }
+
     /**
      * Initialize ViewEngine with framework context
      */
