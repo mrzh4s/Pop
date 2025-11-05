@@ -1,11 +1,6 @@
 
 node_modules
-public/assets/css
-public/assets/js
-public/assets/vendors
-storage/framework
-storage/logs
-storage/cache
+assets
 apps_old
 .env
 .npmrc
