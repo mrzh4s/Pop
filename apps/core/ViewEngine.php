@@ -182,7 +182,7 @@ class ViewEngine {
     private function renderFallback($view, $data = []) {
         try {
             $viewPath = str_replace('.', '/', $view);
-            $fullPath = ROOT_PATH . '/views/' . $viewPath . '.php';
+            $fullPath = ROOT_PATH . '/templates/' . $viewPath . '.php';
             
             if (!file_exists($fullPath)) {
                 if (defined('APP_DEBUG')) {

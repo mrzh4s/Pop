@@ -35,7 +35,7 @@ if (!function_exists('view_fallback')) {
     function view_fallback($view, $data = []) {
         try {
             $viewPath = str_replace('.', '/', $view);
-            $fullPath = ROOT_PATH . '/views/' . $viewPath . '.php';
+            $fullPath = ROOT_PATH . '/templates/' . $viewPath . '.php';
             
             if (!file_exists($fullPath)) {
                 return "<!-- View not found: $fullPath -->";
@@ -179,8 +179,9 @@ if (!function_exists('asset')) {
  * Generate image URL with alt text support
  */
 if (!function_exists('img')) {
-    function img($src,$attributes = [], $alt = '') {
-        $src = asset('images/' . ltrim($src, '/'));
+        
+    function img($src, $alt = '', $attributes = []) {
+        $src = asset('media/' . ltrim($src, '/'));
         $alt = htmlspecialchars($alt);
         
         // Build attributes string
@@ -190,6 +191,17 @@ if (!function_exists('img')) {
         }
         
         return '<img src="' . $src . '" alt="' . $alt . '"' . $attrs . '>';
+    }
+}
+
+
+if(!function_exists('media')) {
+    function media($path) {
+        // Remove leading slash if present
+        $path = ltrim($path, '/');
+
+        $url = asset('media/' . $path);
+        return $url;
     }
 }
 

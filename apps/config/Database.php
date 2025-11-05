@@ -33,35 +33,16 @@ return [
     'connections' => [
 
         /**
-         * Main Database (SQLite)
-         * Default application database
-         */
-        'main' => [
-            'driver' => 'sqlite',
-            'database' => env('APP_DB', 'database/app.db'),
-            'prefix' => '',
-            'foreign_keys' => true,
-
-            // SQLite-specific optimizations
-            'options' => [
-                'journal_mode' => 'WAL',
-                'synchronous' => 'NORMAL',
-                'cache_size' => 10000,
-                'temp_store' => 'MEMORY',
-            ]
-        ],
-
-        /**
          * Source Database (PostgreSQL)
          * External data source
          */
-        'source' => [
+        'main' => [
             'driver' => 'pgsql',
-            'host' => env('SOURCE_DB_HOST', 'localhost'),
-            'port' => env('SOURCE_DB_PORT', 5432),
-            'database' => env('SOURCE_DB_DATABASE', 'source_db'),
-            'username' => env('SOURCE_DB_USERNAME', 'postgres'),
-            'password' => env('SOURCE_DB_PASSWORD', ''),
+            'host' => env('DB_HOST', 'localhost'),
+            'port' => env('DB_PORT', 5432),
+            'database' => env('DB_DATABASE', 'db'),
+            'username' => env('DB_USERNAME', 'postgres'),
+            'password' => env('DB_PASSWORD', ''),
             'charset' => 'utf8',
             'prefix' => '',
             'schema' => 'public',
@@ -71,28 +52,6 @@ return [
                 'statement_timeout' => '300s',
                 'lock_timeout' => '30s',
                 'idle_in_transaction_session_timeout' => '300s',
-                'timezone' => 'UTC',
-            ]
-        ],
-
-        /**
-         * Destination Database (PostgreSQL)
-         * Migration destination or backup
-         */
-        'dest' => [
-            'driver' => 'pgsql',
-            'host' => env('DEST_DB_HOST', 'localhost'),
-            'port' => env('DEST_DB_PORT', 5432),
-            'database' => env('DEST_DB_DATABASE', 'dest_db'),
-            'username' => env('DEST_DB_USERNAME', 'postgres'),
-            'password' => env('DEST_DB_PASSWORD', ''),
-            'charset' => 'utf8',
-            'prefix' => '',
-            'schema' => 'public',
-
-            'options' => [
-                'statement_timeout' => '300s',
-                'lock_timeout' => '30s',
                 'timezone' => 'UTC',
             ]
         ],

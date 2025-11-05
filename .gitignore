@@ -1,6 +1,8 @@
 
 node_modules
-assets
+apps/assets/css
+apps/assets/js
+apps/assets/vendors
 apps_old
 .env
 .claude

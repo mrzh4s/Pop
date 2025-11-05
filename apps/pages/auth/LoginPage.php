@@ -11,12 +11,12 @@ class LoginPage extends BasePage {
     public function show($params = []) {
         // If already authenticated, redirect to home
         if (session('authenticated')) {
-            redirect('home');
+            redirect('dashboard');
             return;
         }
         
         // Render the signin view
-        return $this->view('signin', [
+        return $this->view('auth.signin', [
             'title' => 'Sign In',
             'error' => $params['error'] ?? null
         ]);

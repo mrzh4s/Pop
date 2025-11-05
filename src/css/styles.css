@@ -3,7 +3,8 @@
 
 /* Tailwind scan sources */
 @source '../../apps/assets/vendors/ktui/';
-@source '../../src/views/**/*.php';
+@source '../../apps/templates/**/*.php';
+@source '../../apps/components/**/*.php';
 @source '../../src/core/**/*.js';
 @source '../../src/core/**/*.ts';
 

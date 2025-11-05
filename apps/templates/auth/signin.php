@@ -7,10 +7,10 @@
 
 <?php section('content'); ?>
 <div class="kt-card max-w-[370px] w-full">
-    <form class="kt-card-content flex flex-col gap-5 p-10" id="sign_in_form">
-        <a href="<?= route('home') ?>" class="inline-flex items-center justify-center">
-            <?= img('apps/' . app_name() . '-default.webp', app_name(), ['class' => 'dark:hidden h-10 w-auto']) ?>
-            <?= img('apps/' . app_name() . '-dark.webp', app_name(), ['class'=>'hidden dark:block h-10 w-auto']) ?>
+    <form class="kt-card-content flex flex-col gap-5 p-10">
+        <a href="<?= route('dashboard') ?>" class="inline-flex items-center justify-center">
+            <?= img('apps/' . app_name() . '-default.webp', app_name(), ['class' => 'dark:hidden h-15 w-auto']) ?>
+            <?= img('apps/' . app_name() . '-dark.webp', app_name(), ['class'=>'hidden dark:block h-15 w-auto']) ?>
         </a>
 
         <div class="text-center mb-2.5">
@@ -21,7 +21,7 @@
                 <span class="text-sm text-secondary-foreground me-1.5">
                     Daftar akaun baru?
                 </span>
-                <a class="text-sm link" href="<?= route('auth.signup') ?>">
+                <a class="text-sm link" href="<?php //route('auth.signup') ?>">
                     Di sini
                 </a>
             </div>
@@ -44,7 +44,7 @@
                 <label class="kt-form-label font-normal text-mono">
                     Kata Laluan
                 </label>
-                <a class="text-sm kt-link shrink-0" href="<?= route('auth.reset') ?>">
+                <a class="text-sm kt-link shrink-0" href="<?php //route('auth.reset') ?>">
                     Terlupa Kata Laluan?
                 </a>
             </div>

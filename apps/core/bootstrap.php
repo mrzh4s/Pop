@@ -64,7 +64,6 @@ class Bootstrap {
     // Service load order (after core classes)
     private static $serviceLoadOrder = [
         // Add more services as needed
-        'GravityFormService'
     ];
     
     // Helper files load order (dependency-aware)
@@ -86,7 +85,7 @@ class Bootstrap {
     ];
     
     private static $serviceHelperOrder = [
-        'gravityform'
+        // Add service helper names as needed
     ];
     
     /**

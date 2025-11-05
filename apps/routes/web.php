@@ -4,7 +4,7 @@
 $router->get('/', function() {
 
     if (session('authenticated')) {
-        header("Location: home", true, 302);
+        header("Location: dashboard", true, 302);
     } else {
         redirect('auth.signin');
     }
@@ -22,12 +22,7 @@ $router->get('/auth/register', 'RegisterPage@show', ['guest'])
 
 
 // Load home routes
-$router->get('/home', 'HomePage@show', ['auth'])->name('home');
-
-// Load Applications routes
-$router->get('/applications/create', 'application/CreatePage@show', ['auth'])->name('applications.create');
-$router->get('/applications/migrate', 'application/MigratePage@show', ['auth'])->name('applications.migrate');
-$router->get('/applications/migrate/new/{id:number}', 'application/migrate/NewPage@show', ['auth'])->name('applications.migrate.new');
+$router->get('/dashboard', 'DashboardPage@show', ['auth'])->name('dashboard');
 
 
 // Load Error routes

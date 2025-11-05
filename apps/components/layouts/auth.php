@@ -2,7 +2,6 @@
 <html class="h-full" data-kt-theme="true" data-kt-theme-mode="light" dir="ltr" lang="en">
 
 <head>
-    <base href="../../../../" />
     <title><?= slot('title', app_name() ?? 'APP') ?></title>
     <meta charset="utf-8" />
     <meta content="follow, index" name="robots" />
