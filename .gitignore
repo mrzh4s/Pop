@@ -3,6 +3,7 @@ node_modules
 assets
 apps_old
 .env
+.claude
 .npmrc
 *.min.js
 *.min.css
