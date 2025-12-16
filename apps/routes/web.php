@@ -21,8 +21,11 @@ $router->get('/auth/register', 'RegisterPage@show', ['guest'])
     ->name('auth.register');
 
 
-// Load home routes
-$router->get('/dashboard', 'DashboardPage@show', ['auth'])->name('dashboard');
+// Load home routes (public for testing)
+$router->get('/dashboard', 'DashboardPage@show', ['public'])->name('dashboard');
+
+// Map page (public for testing)
+$router->get('/map', 'MapPage@show', ['public'])->name('map');
 
 
 // Load Error routes

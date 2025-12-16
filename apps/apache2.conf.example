@@ -1,0 +1,56 @@
+# HTTP VirtualHost - Main Site
+<VirtualHost *:80>
+    ServerName pop.test
+    ServerAdmin admin@pop.test
+    DocumentRoot /home/user/Pop/apps
+
+    # Logging
+    ErrorLog ${APACHE_LOG_DIR}/pop-error.log
+    CustomLog ${APACHE_LOG_DIR}/pop-access.log combined
+
+    <Directory /home/user/Pop/apps>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    # Rewrite rules for PHP routing
+    <IfModule mod_rewrite.c>
+        RewriteEngine On
+
+        # Serve static assets directly
+        RewriteCond %{REQUEST_URI} ^/assets/
+        RewriteRule ^ - [L]
+
+        RewriteCond %{REQUEST_URI} ^/media/
+        RewriteRule ^ - [L]
+
+        # Route all other requests to index.php
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteRule ^(.*)$ /index.php [QSA,L]
+    </IfModule>
+
+    # PHP configuration
+    <FilesMatch \.php$>
+        SetHandler application/x-httpd-php
+    </FilesMatch>
+
+    # Security - don't execute PHP in uploads
+    <DirectoryMatch "^/home/user/Pop/uploads/">
+        <FilesMatch "\.php$">
+            Require all denied
+        </FilesMatch>
+    </DirectoryMatch>
+
+    # Enable CORS for Vite dev server
+    Header set Access-Control-Allow-Origin "http://localhost:5173"
+    Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type"
+
+    # Security Headers
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</VirtualHost>

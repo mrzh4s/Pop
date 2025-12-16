@@ -57,6 +57,7 @@ class Bootstrap {
 
         // Application components
         'ViewEngine',      // View rendering
+        'Inertia',         // Inertia.js adapter (React/Vue bridge)
         'Router',          // Routing system
         'Curl',            // HTTP client
     ];
@@ -585,4 +586,25 @@ if (!function_exists('APP_load_service')) {
     function APP_load_service($serviceName) {
         return Bootstrap::loadService($serviceName);
     }
+}
+
+// ============== INERTIA SHARED DATA ==============
+
+// Share global data with Inertia
+if (class_exists('Inertia')) {
+    Inertia::share([
+        'auth' => [
+            'user' => [
+                'name' => $_SESSION['user_name'] ?? null,
+                'email' => $_SESSION['user_email'] ?? null,
+            ],
+        ],
+        'flash' => [
+            'success' => $_SESSION['flash_success'] ?? null,
+            'error' => $_SESSION['flash_error'] ?? null,
+        ],
+    ]);
+
+    // Clear flash messages after sharing
+    unset($_SESSION['flash_success'], $_SESSION['flash_error']);
 }

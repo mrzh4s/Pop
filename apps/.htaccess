@@ -2,13 +2,12 @@
   RewriteEngine On
 
   # ---------------------------------------
-  # 1) Force HTTPS (handles proxies/CDN)
-  #    307 preserves POST/PUT bodies
+  # 1) HTTPS redirect disabled (using HTTP only)
   # ---------------------------------------
-  RewriteCond %{HTTPS} !=on
-  RewriteCond %{HTTP:X-Forwarded-Proto} !https [OR]
-  RewriteCond %{HTTP:Forwarded} !"proto=https"
-  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=307]
+  # RewriteCond %{HTTPS} !=on
+  # RewriteCond %{HTTP:X-Forwarded-Proto} !https [OR]
+  # RewriteCond %{HTTP:Forwarded} !"proto=https"
+  # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=307]
 
   # ---------------------------------------
   # 2) Serve existing files/directories as-is
