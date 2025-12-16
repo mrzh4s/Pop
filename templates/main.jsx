@@ -1,7 +1,6 @@
-import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
-import './styles/app.css';
+import './styles/globals.css';
 
 // Import all page components
 const views = import.meta.glob('./views/**/*.jsx', { eager: true });

@@ -288,9 +288,9 @@ class Inertia {
      * @return void
      */
     private static function renderDefaultTemplate($pageJson) {
-        $appName = defined('APP_NAME') ? APP_NAME : 'Pop Framework';
-        $appUrl = defined('APP_URL') ? APP_URL : '';
-        $isLocal = defined('APP_ENV') && APP_ENV === 'local';
+        $appName = app('name') ?? 'Pop Framework';
+        $appUrl = app('url') ?? '';
+        $isLocal = app('env') === 'local';
 
         echo "<!DOCTYPE html>
 <html lang=\"en\">

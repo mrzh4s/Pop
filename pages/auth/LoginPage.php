@@ -16,7 +16,7 @@ class LoginPage extends BasePage {
         }
         
         // Render the signin view
-        return $this->view('auth.signin', [
+        return inertia('auth/Signin', [
             'title' => 'Sign In',
             'error' => $params['error'] ?? null
         ]);

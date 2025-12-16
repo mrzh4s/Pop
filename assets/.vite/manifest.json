@@ -1,8 +1,8 @@
 {
-  "src/main.jsx": {
+  "templates/main.jsx": {
     "file": "js/main.js",
     "name": "main",
-    "src": "src/main.jsx",
+    "src": "templates/main.jsx",
     "isEntry": true,
     "css": [
       "css/main.css"
