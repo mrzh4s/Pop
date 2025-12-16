@@ -11,25 +11,25 @@ export default defineConfig({
   base: process.env.VITE_BASE_URL || '/',
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./apps/src', import.meta.url)),
+      '@': fileURLToPath(new URL('./templates', import.meta.url)),
     },
   },
   build: {
     chunkSizeWarningLimit: 3000,
-    outDir: 'apps/assets',         // Output to apps/assets folder
+    outDir: 'assets',         // Output to apps/assets folder
     emptyOutDir: true,             // Clean only the assets folder
     manifest: true,                // Generate manifest.json for asset versioning
     rollupOptions: {
-      input: 'apps/src/main.jsx',  // From project root
+      input: 'templates/main.jsx',  // From project root
       output: {
-        entryFileNames: 'js/[name]-[hash].js',
-        chunkFileNames: 'js/[name]-[hash].js',
+        entryFileNames: 'js/[name].js',
+        chunkFileNames: 'js/[name].js',
         assetFileNames: (assetInfo) => {
           const ext = assetInfo.names?.[0]?.split('.').pop() || '';
           if (ext === 'css') {
-            return 'css/[name]-[hash][extname]';
+            return 'css/[name][extname]';
           }
-          return 'media/[name]-[hash][extname]';
+          return 'media/[name][extname]';
         },
       },
     },

@@ -4,7 +4,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import './styles/app.css';
 
 // Import all page components
-const pages = import.meta.glob('./pages/**/*.jsx', { eager: true });
+const views = import.meta.glob('./views/**/*.jsx', { eager: true });
 
 // Get the app element
 const el = document.getElementById('app');
@@ -15,7 +15,7 @@ const initialPage = JSON.parse(el.dataset.page);
 createInertiaApp({
   id: 'app',
   resolve: (name) => {
-    const page = pages[`./pages/${name}.jsx`];
+    const page = views[`./views/${name}.jsx`];
     if (!page) {
       throw new Error(`Page not found: ${name}`);
     }

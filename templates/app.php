@@ -14,8 +14,8 @@
         <script type="module" src="http://localhost:5173/src/main.jsx"></script>
     <?php else: ?>
         <!-- Production: Built Assets -->
-        <link rel="stylesheet" href="/assets/css/main.css">
-        <script type="module" src="/assets/js/main.js"></script>
+        <link rel="stylesheet" href="assets/css/main.css">
+        <script type="module" src="assets/js/main.js"></script>
     <?php endif; ?>
 
     <style>

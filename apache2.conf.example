@@ -2,13 +2,13 @@
 <VirtualHost *:80>
     ServerName pop.test
     ServerAdmin admin@pop.test
-    DocumentRoot /home/user/Pop/apps
+    DocumentRoot /home/user/Pop
 
     # Logging
     ErrorLog ${APACHE_LOG_DIR}/pop-error.log
     CustomLog ${APACHE_LOG_DIR}/pop-access.log combined
 
-    <Directory /home/user/Pop/apps>
+    <Directory /home/user/Pop>
         Options Indexes FollowSymLinks
         AllowOverride All
         Require all granted
