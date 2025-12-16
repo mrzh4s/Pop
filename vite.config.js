@@ -11,16 +11,16 @@ export default defineConfig({
   base: process.env.VITE_BASE_URL || '/',
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@': fileURLToPath(new URL('./apps/src', import.meta.url)),
     },
   },
   build: {
     chunkSizeWarningLimit: 3000,
-    outDir: 'assets',         // Output to apps/assets folder
+    outDir: 'apps/assets',         // Output to apps/assets folder
     emptyOutDir: true,             // Clean only the assets folder
     manifest: true,                // Generate manifest.json for asset versioning
     rollupOptions: {
-      input: 'src/main.jsx',  // From project root
+      input: 'apps/src/main.jsx',  // From project root
       output: {
         entryFileNames: 'js/[name]-[hash].js',
         chunkFileNames: 'js/[name]-[hash].js',

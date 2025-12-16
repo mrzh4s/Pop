@@ -14,13 +14,13 @@ class DashboardPage extends BasePage {
 
         // Demo stats data
         $stats = [
-            'totalSales' => 125000,
-            'totalOrders' => 450,
-            'customers' => 1250,
+            'totalUsers' => 12500,
+            'activeSessions' => 450,
+            'apiRequests' => 1250,
         ];
 
         // Use Inertia to render React component
-        return Inertia::render('Dashboard', [
+        return inertia('Dashboard', [
             'user' => $userData,
             'stats' => $stats
         ]);
