@@ -1,4 +1,6 @@
 <?php
+namespace App\Config;
+
 /**
  * Database Configuration
  * File: apps/config/Database.php
@@ -111,9 +113,9 @@ return [
      * These apply to all connections unless overridden
      */
     'pdo_options' => [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
-        PDO::ATTR_EMULATE_PREPARES => false,
-        PDO::ATTR_STRINGIFY_FETCHES => false,
+        \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+        \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_OBJ,
+        \PDO::ATTR_EMULATE_PREPARES => false,
+        \PDO::ATTR_STRINGIFY_FETCHES => false,
     ],
 ];

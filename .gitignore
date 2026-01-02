@@ -1,13 +1,50 @@
+# Dependencies
+/node_modules
+/vendor
 
-node_modules
-apps/assets/css
-apps/assets/js
-apps/assets/vendors
-apps_old
+# Environment
 .env
-.claude
-.npmrc
-*.min.js
-*.min.css
-*.bundle.js
-*.bundle.css
+.env.local
+.env.*.local
+
+# Storage
+/storage/logs/*
+/storage/cache/*
+/storage/sessions/*
+/storage/uploads/*
+!storage/**/.gitkeep
+
+# Build outputs
+/infrastructure/http/public/assets/*
+!/infrastructure/http/public/assets/.gitkeep
+/frontend/dist
+/frontend/build
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# PHP
+composer.phar
+composer.lock
+*.cache
+
+# Node
+package-lock.json
+yarn.lock
+npm-debug.log
+yarn-error.log
+
+# Logs
+*.log
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Testing
+.phpunit.result.cache
+/coverage

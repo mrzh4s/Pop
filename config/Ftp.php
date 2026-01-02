@@ -1,4 +1,6 @@
 <?php
+namespace App\Config;
+
 /**
  * FTP Configuration
  * File: apps/config/Ftp.php

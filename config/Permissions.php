@@ -1,4 +1,6 @@
 <?php
+namespace App\Config;
+
 /**
  * Permissions & Roles Configuration
  * File: apps/config/Permissions.php
