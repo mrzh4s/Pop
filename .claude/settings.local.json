@@ -56,7 +56,17 @@
       "Bash(REQUEST_URI=\"/\" REQUEST_METHOD=\"GET\" php:*)",
       "Bash(REQUEST_URI=\"/\" REQUEST_METHOD=\"GET\" SERVER_NAME=\"localhost\" php:*)",
       "Bash(1)",
-      "Bash(REQUEST_URI=\"/\" REQUEST_METHOD=\"GET\" SERVER_NAME=\"localhost\" HTTP_ACCEPT=\"text/html\" php:*)"
+      "Bash(REQUEST_URI=\"/\" REQUEST_METHOD=\"GET\" SERVER_NAME=\"localhost\" HTTP_ACCEPT=\"text/html\" php:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(git log:*)",
+      "Bash(for file in Session Security Cookie Activity Configuration Connection Curl Environment Permission Traffic)",
+      "Bash(do sed -i '1 a\\\\\\\\nnamespace Framework\\\\\\\\Core\\\\\\\\Http;' $file.php)",
+      "Bash(head:*)",
+      "Bash(REQUEST_URI=\"/\" REQUEST_METHOD=\"GET\" php infrastructure/http/public/index.php:*)",
+      "Bash(REQUEST_URI=\"/auth/signin\" REQUEST_METHOD=\"GET\" php:*)",
+      "Bash(REQUEST_URI=\"/auth/register\" REQUEST_METHOD=\"GET\" php Infrastructure/Http/Public/index.php)",
+      "Bash(REQUEST_URI=\"/auth/signin\" REQUEST_METHOD=\"GET\" php Infrastructure/Http/Public/index.php)",
+      "Bash(printf:*)"
     ],
     "deny": [],
     "ask": []

@@ -2,49 +2,35 @@
 /node_modules
 /vendor
 
+# Build output
+/public/build
+/public/hot
+
 # Environment
 .env
-.env.local
-.env.*.local
-
-# Storage
-/storage/logs/*
-/storage/cache/*
-/storage/sessions/*
-/storage/uploads/*
-!storage/**/.gitkeep
-
-# Build outputs
-/infrastructure/http/public/assets/*
-!/infrastructure/http/public/assets/.gitkeep
-/frontend/dist
-/frontend/build
+.env.*
+!.env.example
 
 # IDE
-.idea
-.vscode
+.vscode/
+.idea/
 *.swp
 *.swo
 *~
 
-# PHP
-composer.phar
-composer.lock
-*.cache
-
-# Node
-package-lock.json
-yarn.lock
-npm-debug.log
-yarn-error.log
+# OS
+.DS_Store
+Thumbs.db
 
 # Logs
 *.log
+/storage/logs/*
 
-# OS
-Thumbs.db
-.DS_Store
+# Database
+*.db
+*.sqlite
+!.gitkeep
 
-# Testing
-.phpunit.result.cache
-/coverage
+# Cache
+/storage/cache/*
+!storage/cache/.gitkeep

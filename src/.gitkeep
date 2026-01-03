@@ -1,7 +1,0 @@
-# Your PHP code goes here
-#
-# Recommended structure:
-# - Controllers/  - Request handlers
-# - Models/       - Data models
-# - Services/     - Business logic
-# - Middleware/   - Custom middleware

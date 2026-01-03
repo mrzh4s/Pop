@@ -1,25 +1,45 @@
 {
     "name": "pop-framework/pop",
-    "description": "Minimal PHP Template - Ready for your JS framework",
+    "description": "Pop Framework - VS Architecture Template",
     "type": "project",
     "license": "MIT",
     "keywords": ["php", "template", "minimal", "framework", "react", "vue", "svelte"],
     "require": {
-        "php": "^8.1"
+        "php": "^8.4"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.0"
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src/"
+            "Framework\\": "Framework/",
+            "Infrastructure\\": "Infrastructure/",
+            "Features\\": "Features/",
+            "Config\\": "Config/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\": "Tests/"
         }
     },
+    "helpers": [
+        "Framework/Helpers/activity.php",
+        "Framework/Helpers/config.php",
+        "Framework/Helpers/connection.php",
+        "Framework/Helpers/cookie.php",
+        "Framework/Helpers/debug.php",
+        "Framework/Helpers/env.php",
+        "Framework/Helpers/http.php",
+        "Framework/Helpers/inertia.php",
+        "Framework/Helpers/migration.php",
+        "Framework/Helpers/permission.php",
+        "Framework/Helpers/router.php",
+        "Framework/Helpers/security.php",
+        "Framework/Helpers/session.php",
+        "Framework/Helpers/traffic.php",
+        "Framework/Helpers/view.php"
+    ],
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
