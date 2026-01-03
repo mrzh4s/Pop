@@ -1,13 +1,36 @@
+# Dependencies
+/node_modules
+/vendor
 
-node_modules
-apps/assets/css
-apps/assets/js
-apps/assets/vendors
-apps_old
+# Build output
+/Infrastructure/Http/Public/assets
+/Infrastructure/Http/Public/.vite
+
+# Environment
 .env
-.claude
-.npmrc
-*.min.js
-*.min.css
-*.bundle.js
-*.bundle.css
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+/storage/logs/*
+
+# Database
+*.db
+*.sqlite
+!.gitkeep
+
+# Cache
+/storage/cache/*
+!storage/cache/.gitkeep

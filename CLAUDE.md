@@ -2,340 +2,363 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## About Pop Framework
+## Project Overview
 
-Pop Framework is a lightweight PHP framework designed to bridge old and new coding practices with a simple structure and modern features. It supports both PostgreSQL and SQLite with 100% portable code using schema notation.
+**Pop Framework** is a custom PHP framework implementing **Vertical Slice Architecture (VSA)** with Inertia.js integration for building modern PHP + React/Vue applications. The framework is deliberately minimal with zero external dependencies (except PHPUnit for testing).
 
-## Technology Stack
+## Commands
 
-- **PHP**: 8.4+ (backend framework)
-- **Frontend**: Tailwind CSS 4, TypeScript, Webpack
-- **Databases**: SQLite (development), PostgreSQL (production)
-- **Build Tools**: npm, webpack, Tailwind CLI
-
-## Build and Development Commands
-
-### Frontend Development
+### Development
 ```bash
-# Development mode with hot reload
-npm run dev                  # Run CSS and JS watchers in parallel
-npm run dev:css              # Watch CSS changes only
-npm run dev:js               # Watch JS changes only
+# Install dependencies
+composer install
+npm install
 
-# Build commands
-npm run build                # Build CSS and JS for development
-npm run build:css            # Build CSS only
-npm run build:js             # Build JS only
-npm run build:prod           # Build for production (minified)
+# Start development server (requires web server configuration)
+php -S localhost:8000 -t public
 
-# Code quality
-npm run lint                 # Lint TypeScript files
+# Start Vite dev server for frontend
+npm run dev
+
+# Build frontend assets
+npm run build
 ```
 
-### PHP Development
-The framework has no CLI commands. PHP runs through a web server (Apache/nginx).
+### Database
+```bash
+# Migrations are auto-run on bootstrap - no manual migration command needed
+# Database location: Infrastructure/persistence/database/app.db
+```
 
-**Access points:**
-- Main entry: `/apps/index.php`
-- Bootstrap: `/apps/core/bootstrap.php`
-- Routes: `/apps/routes.php`
+### Code Quality
+```bash
+# Run tests (when test suite is created)
+./vendor/bin/phpunit
 
-## Core Architecture
+# Enable error reporting (already enabled in public/index.php)
+# No linting/formatting tools configured yet
+```
 
-### 1. Bootstrap System (`apps/core/bootstrap.php`)
+## Architecture
 
-The framework uses an auto-discovery bootstrap system that loads classes and helpers in dependency order:
+### Vertical Slice Architecture (VSA)
 
-**Load Order:**
-1. **Core Classes** (in `apps/core/`):
-   - Environment → Configuration → Session → Cookie → Security
-   - Connection → Migration
-   - Permission → Activity → Traffic
-   - ViewEngine → Router → Curl
+Each feature is self-contained with all its logic in one directory:
 
-2. **Service Classes** (in `apps/services/`):
-   - Auto-discovered after core classes
+```
+Features/
+└── Auth/
+    ├── Login/
+    │   ├── LoginCommand.php      # Input DTO
+    │   ├── LoginHandler.php      # Business logic
+    │   ├── LoginController.php   # HTTP layer
+    │   └── LoginResponse.php     # Output DTO
+    └── Shared/
+        ├── Domain/               # Domain models (User, UserDetails)
+        ├── Ports/                # Interfaces (UserRepositoryInterface)
+        ├── Adapters/             # Implementations (PgUserRepository)
+        └── Exceptions/           # Feature-specific exceptions
+```
 
-3. **Helper Functions** (in `apps/core/helpers/`):
-   - Loaded after their corresponding classes
-   - Example: `permission.php` loads after `Permission.php`
+**Key Principles:**
+- Features are independent vertical slices, not layered
+- Shared code goes in `Features/[Feature]/Shared/`
+- Ports & Adapters pattern for clean dependencies
+- Domain logic in Handlers, HTTP concerns in Controllers
 
-### 2. Routing System (`apps/core/Router.php`)
+### Directory Structure
 
-**Smart Auto-Detection:**
-- Routes automatically detect pages in `apps/pages/` folder
-- Supports nested folder structures
-- No prefix needed for page names
+- **`/Framework`** - Core framework classes (Bootstrap, Router, Database, Security, etc.)
+- **`/Features`** - Business features as vertical slices
+- **`/Infrastructure`** - Infrastructure concerns (routes, persistence, views)
+- **`/Config`** - Configuration files (auto-discovered from env vars)
+- **`/public`** - Web root with index.php entry point
+- **`/docs`** - SQL schemas and documentation
+
+### Bootstrap Flow
+
+1. **public/index.php** defines ROOT_PATH and loads Framework/Bootstrap.php
+2. **Bootstrap.php** auto-loads in this order:
+   - Core classes (Environment, Configuration, Session, Security, etc.)
+   - Database components (Connection, Migration)
+   - Auth components (Permission, Activity, Traffic)
+   - Application components (ViewEngine, Inertia, Router)
+   - Service classes (auto-discovered from /services if exists)
+   - Helper files (15 helpers with dependency-aware loading)
+3. **Routes** loaded from Infrastructure/Http/Routes/{web,api}.php
+4. **Router** dispatches to Controllers
+
+### Database Architecture
+
+**Multi-Database with Auto-Discovery:**
+- Environment variables pattern: `{NAME}_DB_HOST`, `{NAME}_DB_PORT`, etc.
+- Example: `MAIN_DB_HOST` creates a 'main' connection
+- Access via: `DB::connection('main')`
+- Supports: SQLite, PostgreSQL, MySQL, SQL Server
+
+**Current Setup:**
+- Default: SQLite at `Infrastructure/persistence/database/app.db`
+- Auth schema via ATTACH DATABASE pattern
+- Migrations auto-run on bootstrap from `Infrastructure/persistence/migrations/`
+
+### Inertia.js Integration
+
+**Custom Inertia Adapter** (no Composer dependency):
+- Located in `Framework/View/Inertia.php`
+- Helper function: `inertia('ComponentName', $props)`
+- SSR support via Node.js server on port 13714
+- Asset versioning built-in
+- Lazy prop loading support
+
+**Frontend (React + Tailwind CSS v4):**
+- Entry point: `resources/js/app.jsx`
+- Build system: Vite (vite.config.js)
+- Dev server: localhost:5173
+- Build output: `public/build/`
+- Path alias: `@` → `resources/js/`
+
+### Helper Functions
+
+15 auto-loaded global helpers:
+
+```php
+env($key, $default)              // Environment variables
+config($key, $default)           // Configuration values
+session($key, $default)          // Session data
+request($key, $default)          // Request data (auto-detects JSON/form)
+view($template, $data)           // Render Blade templates
+inertia($component, $props)      // Render Inertia components
+route($name, $params)            // Generate named route URLs
+can($permission)                 // Check user permissions
+redirect($routeName)             // Redirect to named route
+csrf_token()                     // Get CSRF token
+csrf_field()                     // CSRF hidden input field
+```
+
+### Routing System
 
 **Route Definition:**
 ```php
-// In apps/routes/web.php or apps/routes/api.php
-$router->get('/path', 'PageClass@method', 'route.name');
-$router->post('/path', 'PageClass@method');
+// In Infrastructure/Http/Routes/web.php or api.php
+use Framework\Http\Router;
+
+Router::get('/path', 'ControllerName@method', ['middleware'])->name('route.name');
+Router::post('/api/endpoint', 'ControllerName@action', ['auth']);
 ```
 
-**Middleware:**
+**Built-in Middleware:**
+- `auth` - Requires authenticated user
+- `guest` - Only for non-authenticated users
+- `public` - Accessible to all
+- `permission:permission.name` - Requires specific permission
+- `role:rolename` - Requires specific role
+
+**Controller Naming:**
+- Page controllers: `LoginPage`, `DashboardPage`, `MapPage`
+- Methods: `show()` for rendering, action names for POST handlers
+
+### Middleware System
+
+**Auto-Discovery:**
+Middleware classes are automatically discovered from:
+- `Infrastructure/Http/Middleware/` - Global middleware
+- `Features/*/Middleware/` - Feature-specific middleware
+
+**Naming Convention:**
+- File: `{Name}Middleware.php`
+- Class: `{Name}Middleware`
+- Route usage: Derived from class name (e.g., `AuthMiddleware` → `auth`)
+
+**Creating Middleware:**
+
+1. **Global Middleware** (Infrastructure/Http/Middleware/):
 ```php
-$router->middleware('auth', 'authMiddleware');
-$router->middleware('guest', 'guestMiddleware');
+<?php
+namespace Infrastructure\Http\Middleware;
+
+class AuthMiddleware
+{
+    public function handle()
+    {
+        if (!session('authenticated')) {
+            redirect('auth.signin');
+            return false; // Halt request
+        }
+        return true; // Continue
+    }
+}
 ```
 
-### 3. Multi-Database System (`apps/core/Connection.php`)
-
-**Configuration:** `apps/config/Database.php`
-
-The framework supports unlimited named database connections:
-
+2. **Feature-Specific Middleware** (Features/{Feature}/Middleware/):
 ```php
-// Access different databases
-$main = DB::connection();              // Default connection
-$source = DB::connection('source');    // PostgreSQL source
-$dest = DB::connection('dest');        // PostgreSQL destination
-$analytics = DB::connection('analytics'); // Custom connection
+<?php
+namespace Features\Auth\Middleware;
+
+class AdminMiddleware
+{
+    public function handle()
+    {
+        if (!can('system.admin')) {
+            header("Location: /dashboard", true, 302);
+            exit;
+        }
+        return true;
+    }
+}
 ```
 
-**Supported Drivers:**
-- `sqlite` - Development and embedded
-- `pgsql` / `postgres` / `postgresql` - Production
-- `mysql` - MySQL/MariaDB
-- `sqlsrv` / `mssql` - SQL Server
+**Usage in Routes:**
+```php
+// Simple middleware (no parameters)
+Router::get('/admin/users', 'UserPage@index', ['auth', 'admin']);
 
-### 4. Schema Organization Pattern
-
-**Critical: Both PostgreSQL and SQLite use identical schema notation**
-
-**PostgreSQL:**
-```sql
-CREATE SCHEMA IF NOT EXISTS auth;
-CREATE TABLE auth.users (...);
-CREATE TABLE auth.permissions (...);
+// Parameterized middleware
+Router::get('/posts', 'PostPage@index', ['permission:posts.view']);
+Router::post('/posts', 'PostPage@create', ['permission:posts.create']);
+Router::get('/admin/settings', 'SettingsPage@index', ['role:admin']);
 ```
 
-**SQLite (using ATTACH DATABASE):**
-```sql
-ATTACH DATABASE 'database/auth.db' AS auth;
-CREATE TABLE auth.users (...);
-CREATE TABLE auth.permissions (...);
-```
+**Parameterized Middleware:**
 
-**Schema Structure:**
-- `auth` schema: Authentication, authorization, users, roles, permissions
-- `log` schema: Activity logging (`log.user_activities`, `log.project_activities`)
-- `traffic` schema: API traffic monitoring (`traffic.api_traffic`)
-
-This makes code 100% portable between databases!
-
-### 5. Migration System (`apps/core/Migration.php`)
-
-**Auto-Migration on Startup:**
-Set `AUTO_MIGRATE=true` in `.env` to run migrations automatically on app start.
-
-**Migration Files:** `apps/database/migrations/*.sql`
-
-**Naming Convention:** `000_`, `001_`, `002_`, `003_` prefix for execution order
-
-**Current Migrations:**
-- `000_create_auth_tables.sql` - Auth system (users, groups, sessions)
-- `001_create_permissions_tables.sql` - RBAC (roles, permissions)
-- `002_create_activity_tables.sql` - Activity logs
-- `003_create_traffic_tables.sql` - API traffic
-
-**Migration Pattern:**
-```sql
-BEGIN TRANSACTION;
-
--- 1. ATTACH DATABASE for schema (SQLite only)
-ATTACH DATABASE 'database/auth.db' AS auth;
-
--- 2. Drop tables (for re-runnable migrations)
-DROP TABLE IF EXISTS auth.users;
-
--- 3. Create tables
-CREATE TABLE IF NOT EXISTS auth.users (...);
-
--- 4. Add indexes
-CREATE INDEX IF NOT EXISTS idx_users_email ON auth.users(email);
-
--- 5. Create views (optional)
-CREATE VIEW IF NOT EXISTS auth.user_summary AS ...;
-
--- 6. Insert seed data
-INSERT INTO auth.users VALUES (...);
-
-COMMIT;
-```
-
-### 6. Permission System (`apps/core/Permission.php`)
-
-**Dual-Source System:** Can load from config file OR database
-
-**Configuration:** `apps/config/Permissions.php` or `auth.permission_settings` table
-
-**Features:**
-- Role-based access control (RBAC)
-- Role hierarchy with inheritance
-- Direct user permission overrides
-- Attribute-based access control (ABAC)
-- Permission caching
-
-**Database Tables:**
-- `auth.roles` - Role definitions
-- `auth.permissions` - Permission definitions
-- `auth.role_hierarchies` - Role inheritance
-- `auth.role_permissions` - Role-permission mapping
-- `auth.user_permissions` - Direct user overrides
-
-### 7. Activity & Traffic Logging
-
-**Activity Logger** (`apps/core/Activity.php`):
-- Tracks user activities with IP, location, device info
-- Tables: `log.user_activities`, `log.project_activities`
-
-**Traffic Logger** (`apps/core/Traffic.php`):
-- Monitors API requests/responses
-- Table: `traffic.api_traffic`
-- Tracks: URL, method, headers, body, response time, status codes
-
-## Directory Structure
-
-```
-/var/www/Pop/
-├── apps/                           # PHP application code
-│   ├── core/                       # Core framework classes
-│   │   ├── bootstrap.php          # Auto-discovery bootstrap
-│   │   ├── Router.php             # Smart routing system
-│   │   ├── Connection.php         # Multi-database support
-│   │   ├── Permission.php         # RBAC system
-│   │   ├── Migration.php          # Auto-migration engine
-│   │   ├── Activity.php           # Activity logging
-│   │   ├── Traffic.php            # API traffic monitoring
-│   │   └── helpers/               # Helper functions
-│   ├── config/                    # Configuration files
-│   │   ├── Database.php           # Database connections
-│   │   └── Permissions.php        # Permission config
-│   ├── database/                  # Database files
-│   │   └── migrations/            # Migration SQL files
-│   ├── pages/                     # Page controllers
-│   ├── routes/                    # Route definitions
-│   │   ├── web.php               # Web routes
-│   │   └── api.php               # API routes
-│   ├── templates/                 # View templates
-│   ├── components/                # Reusable components
-│   ├── services/                  # Business logic services
-│   └── index.php                  # Main entry point
-├── docs/                          # Documentation & SQL schemas
-│   ├── auth/                      # PostgreSQL auth schema
-│   │   ├── auth.table.sql
-│   │   └── auth.seed.sql
-│   ├── permission/                # PostgreSQL permission schema
-│   │   ├── permission.table.sql
-│   │   └── permission.seed.sql
-│   └── SCHEMA_STRUCTURE.md        # Schema documentation
-├── src/                           # Frontend TypeScript source
-├── node_modules/                  # npm dependencies
-├── package.json                   # npm configuration
-└── webpack.config.js              # Webpack configuration
-```
-
-## Important Patterns
-
-### Creating New Migrations
-
-1. **Naming:** Use sequential numbering: `004_description.sql`
-2. **Schema Attachment:** Always attach the appropriate schema
-3. **Transaction Wrapping:** Wrap in BEGIN/COMMIT
-4. **Idempotent:** Use `DROP TABLE IF EXISTS` and `CREATE TABLE IF NOT EXISTS`
-
-**Example:**
-```sql
-BEGIN TRANSACTION;
-
--- Attach schema
-ATTACH DATABASE 'database/auth.db' AS auth;
-
--- Drop if exists
-DROP TABLE IF EXISTS auth.new_table;
-
--- Create table
-CREATE TABLE IF NOT EXISTS auth.new_table (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    ...
-);
-
--- Add indexes
-CREATE INDEX IF NOT EXISTS idx_new_table_field ON auth.new_table(field);
-
-COMMIT;
-```
-
-### Adding New Database Connections
-
-Edit `apps/config/Database.php`:
+Middleware can accept parameters using colon (`:`) syntax:
 
 ```php
-'connections' => [
-    'new_connection' => [
-        'driver' => 'pgsql',
-        'host' => env('NEW_DB_HOST', 'localhost'),
-        'port' => env('NEW_DB_PORT', 5432),
-        'database' => env('NEW_DB_DATABASE', 'dbname'),
-        'username' => env('NEW_DB_USERNAME', 'user'),
-        'password' => env('NEW_DB_PASSWORD', 'pass'),
-    ],
-]
+// Format: 'middleware:param1:param2:param3'
+['permission:users.view']          // Check permission "users.view"
+['permission:system.admin']        // Check permission "system.admin"
+['role:admin']                     // Check if user has admin role
+['role:manager']                   // Check if user has manager role
 ```
 
-Use it:
-```php
-$conn = DB::connection('new_connection');
-```
-
-### Using Schema Notation in Queries
-
-Always use schema notation for portability:
+**Creating Parameterized Middleware:**
 
 ```php
-// Good - Works with both PostgreSQL and SQLite
-$stmt = $db->query("SELECT * FROM auth.users WHERE email = ?");
-$stmt = $db->query("INSERT INTO log.user_activities (user_id, message) VALUES (?, ?)");
-$stmt = $db->query("SELECT * FROM traffic.api_traffic WHERE status = 'error'");
+<?php
+namespace Infrastructure\Http\Middleware;
 
-// Bad - Not portable
-$stmt = $db->query("SELECT * FROM users WHERE email = ?");
+class PermissionMiddleware
+{
+    // Use variadic parameters to accept multiple params
+    public function handle(...$permissions)
+    {
+        if (!session('authenticated')) {
+            redirect('auth.signin');
+            return false;
+        }
+
+        $permissionString = implode('.', $permissions);
+
+        if (!can($permissionString)) {
+            header("Location: /dashboard", true, 302);
+            exit;
+        }
+
+        return true;
+    }
+}
 ```
 
-### Environment Variables
+**Middleware Rules:**
+- Must have a `handle()` method or be invokable (`__invoke`)
+- Can accept parameters: `handle($param1, $param2, ...)`
+- Return `false` to halt the request
+- Return `true` or `void` to continue
+- Can redirect or exit directly
 
-Located in `apps/.env`. Example structure in `apps/.env.example`.
+### Permission System
 
-**Key Variables:**
-- `DB_DEFAULT` - Default database connection name
-- `APP_DB` - SQLite database path
-- `AUTO_MIGRATE` - Auto-run migrations on startup
-- `APP_DEBUG` - Enable debug mode
-- `SOURCE_DB_*` - PostgreSQL source connection
-- `DEST_DB_*` - PostgreSQL destination connection
+**Role Hierarchy** (defined in Config/permissions.php):
+- Superadmin → Corridor → Manager → Officer
+- Roles inherit permissions from lower levels
 
-## PostgreSQL Schema Files
+**Permission Checking:**
+```php
+can('system.admin')              // Check specific permission
+can('users.create')              // Dot notation for namespaced permissions
+can('*')                         // All authenticated users
+```
 
-Located in `docs/` directory for manual execution in production PostgreSQL:
+## Adding New Features
 
-- `docs/auth/auth.table.sql` - Auth schema structure
-- `docs/auth/auth.seed.sql` - Auth seed data
-- `docs/permission/permission.table.sql` - Permission tables
-- `docs/permission/permission.seed.sql` - Permission seed data
+1. **Create Feature Directory:**
+   ```
+   Features/YourFeature/
+   ├── Action/
+   │   ├── ActionCommand.php
+   │   ├── ActionHandler.php
+   │   ├── ActionController.php
+   │   └── ActionResponse.php
+   └── Shared/
+       └── Domain/
+   ```
 
-These are PostgreSQL-specific and separate from SQLite migrations.
+2. **Create Controller** in Features/YourFeature/Action/:
+   ```php
+   namespace Features\YourFeature\Action;
 
-## Key Documentation
+   class ActionController {
+       public function handle(ActionCommand $command): ActionResponse {
+           $handler = new ActionHandler();
+           return $handler->execute($command);
+       }
+   }
+   ```
 
-- `docs/SCHEMA_STRUCTURE.md` - Complete schema organization guide
-- `README.md` - Project overview
+3. **Add Routes** in Infrastructure/Http/Routes/:
+   ```php
+   use Framework\Http\Router;
 
-## Notes
+   Router::get('/feature/action', 'ActionController@handle', ['auth'])
+       ->name('feature.action');
+   ```
 
-- The framework has no test suite currently
-- Hot reload for frontend: Use `npm run dev`
-- Database migrations run automatically if `AUTO_MIGRATE=true`
-- All database queries should use schema notation for portability
-- Permission system can use config OR database as source
+4. **Framework Auto-Discovery** handles the rest via PSR-4 autoloading
+
+## Database Patterns
+
+**Connection Setup (.env):**
+```env
+APP_DB=Infrastructure/persistence/database/app.db
+MAIN_DB_DRIVER=sqlite
+MAIN_DB_DATABASE=Infrastructure/persistence/database/app.db
+```
+
+**Usage:**
+```php
+$db = DB::connection('app');  // or 'main', 'source', etc.
+$stmt = $db->prepare('SELECT * FROM users WHERE id = ?');
+$stmt->execute([$userId]);
+```
+
+**Migrations:**
+- Place SQL files in `Infrastructure/persistence/migrations/`
+- Naming: `001_create_users_table.sql`, `002_add_permissions.sql`
+- Auto-executed on bootstrap in numeric order
+
+## Security Features
+
+- **CSRF Protection**: Auto-enabled for POST/PUT/DELETE routes
+- **Session Security**: Device tracking, IP validation
+- **Password Hashing**: bcrypt via PHP password_hash()
+- **Login Throttling**: Attempts tracked in auth.login_attempts
+- **Permission System**: RBAC with role inheritance
+
+## Key Technical Decisions
+
+1. **Zero External Dependencies** - Everything built in-house except PHPUnit
+2. **Environment-First Config** - All config auto-discovered from env vars
+3. **VSA Over MVC** - Features are vertical slices, not horizontal layers
+4. **Custom Inertia Adapter** - No official Inertia PHP dependency
+5. **SQLite Primary** - Simple deployment, multi-schema via ATTACH DATABASE
+6. **Auto-Discovery Bootstrap** - Classes, services, helpers auto-loaded
+7. **PHP 8.4 Strict** - Modern PHP with strict typing, readonly properties
+
+## Important Notes
+
+- **Migrations are automatic** - No need to run migration commands
+- **Helpers are global** - Available everywhere after bootstrap
+- **Routes use named routes** - Always use `route('name')` not hardcoded paths
+- **Request auto-detects JSON** - `request()` helper handles both JSON and form data
+- **Controllers are thin** - Business logic belongs in Handlers, not Controllers
+- **Shared code in Features/[Feature]/Shared/** - Never create a global "shared" directory
+- **No timestamps in migrations** - Use numeric prefixes: 001_, 002_, etc.
