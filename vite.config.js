@@ -14,8 +14,8 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'Infrastructure/Http/Public/assets',
-    emptyOutDir: true,
+    outDir: 'Infrastructure/Http/Public',
+    emptyOutDir: false,
     manifest: true,
     rollupOptions: {
       input: 'Infrastructure/Resources/js/app.jsx',

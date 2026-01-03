@@ -74,6 +74,15 @@ class Router
     }
 
     /**
+     * Get router instance (alias for getInstance)
+     * Used by helper functions
+     */
+    public static function getRouter()
+    {
+        return self::getInstance();
+    }
+
+    /**
      * Auto-discover and register middleware from dedicated folders
      */
     private function discoverMiddleware()
