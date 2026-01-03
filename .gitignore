@@ -3,8 +3,8 @@
 /vendor
 
 # Build output
-/Infrastructure/Public/assets
-/Infrastructure/Public/.vite
+/Infrastructure/Http/Public/assets
+/Infrastructure/Http/Public/.vite
 
 # Environment
 .env
