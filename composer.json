@@ -23,6 +23,10 @@
             "Tests\\": "Tests/"
         }
     },
+    "scripts": {
+        "dev": "./run.sh",
+        "build": "yarn build"
+    },
     "helpers": [
         "Framework/Helpers/activity.php",
         "Framework/Helpers/config.php",
