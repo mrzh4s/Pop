@@ -204,10 +204,56 @@ if (!function_exists('has_flash_messages')) {
      * Check if there are any flash messages
      */
     function has_flash_messages() {
-        return session_has('__flash.success') || 
-               session_has('__flash.error') || 
-               session_has('__flash.warning') || 
+        return session_has('__flash.success') ||
+               session_has('__flash.error') ||
+               session_has('__flash.warning') ||
                session_has('__flash.info');
+    }
+}
+
+// ============== VALIDATION ERROR HELPERS ==============
+
+if (!function_exists('validation_errors')) {
+    /**
+     * Set validation errors for Inertia
+     *
+     * @param array $errors Associative array of field => error message
+     */
+    function validation_errors(array $errors) {
+        $_SESSION['validation_errors'] = $errors;
+    }
+}
+
+if (!function_exists('validation_error')) {
+    /**
+     * Add a single validation error
+     *
+     * @param string $field Field name
+     * @param string $message Error message
+     */
+    function validation_error($field, $message) {
+        if (!isset($_SESSION['validation_errors'])) {
+            $_SESSION['validation_errors'] = [];
+        }
+        $_SESSION['validation_errors'][$field] = $message;
+    }
+}
+
+if (!function_exists('has_validation_errors')) {
+    /**
+     * Check if there are validation errors
+     */
+    function has_validation_errors() {
+        return !empty($_SESSION['validation_errors']);
+    }
+}
+
+if (!function_exists('clear_validation_errors')) {
+    /**
+     * Clear all validation errors
+     */
+    function clear_validation_errors() {
+        unset($_SESSION['validation_errors']);
     }
 }
 

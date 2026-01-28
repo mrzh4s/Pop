@@ -223,11 +223,14 @@ class Bootstrap {
                 'flash' => [
                     'success' => $_SESSION['flash_success'] ?? null,
                     'error' => $_SESSION['flash_error'] ?? null,
+                    'warning' => $_SESSION['flash_warning'] ?? null,
+                    'info' => $_SESSION['flash_info'] ?? null,
                 ],
+                'errors' => $_SESSION['validation_errors'] ?? (object)[],
             ]);
 
-            // Clear flash messages after sharing
-            unset($_SESSION['flash_success'], $_SESSION['flash_error']);
+            // Clear flash messages and validation errors after sharing
+            unset($_SESSION['flash_success'], $_SESSION['flash_error'], $_SESSION['flash_warning'], $_SESSION['flash_info'], $_SESSION['validation_errors']);
         } catch (Exception $e) {
             error_log("Pop Framework: Inertia data sharing error: " . $e->getMessage());
         }
