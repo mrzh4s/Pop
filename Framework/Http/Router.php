@@ -19,6 +19,7 @@ use Exception;
 class Router
 {
     private static $instance = null;
+    private static $routesDiscovered = false;
 
     private $routes = [];
     private $namedRoutes = [];
@@ -192,6 +193,65 @@ class Router
 
             throw new Exception("Middleware {$className} must have a handle() method or be invokable");
         };
+    }
+
+    /**
+     * Auto-discover and load route modules
+     * Loads routes from Infrastructure/Http/Routes and Features/Routes directories
+     */
+    private function discoverRoutes()
+    {
+        // 1. Load core routes from Infrastructure/Http/Routes
+        $coreRoutesPath = ROOT_PATH . '/Infrastructure/Http/Routes';
+        $this->loadRoutesFromDirectory($coreRoutesPath);
+
+        // 2. Load feature-specific routes from Features/*/Routes
+        $featuresPath = ROOT_PATH . '/Features';
+        if (is_dir($featuresPath)) {
+            $features = scandir($featuresPath);
+            foreach ($features as $feature) {
+                if ($feature === '.' || $feature === '..') {
+                    continue;
+                }
+
+                $featureRoutesPath = $featuresPath . '/' . $feature . '/Shared/Routes';
+                $this->loadRoutesFromDirectory($featureRoutesPath);
+            }
+        }
+    }
+
+    /**
+     * Load all route files from a directory
+     */
+    private function loadRoutesFromDirectory($directory)
+    {
+        if (!is_dir($directory)) {
+            return;
+        }
+
+        // Get all PHP files in the directory
+        $files = glob($directory . '/*.php');
+
+        // Sort files alphabetically for consistent loading order
+        sort($files);
+
+        foreach ($files as $file) {
+            $this->loadRouteFile($file);
+        }
+    }
+
+    /**
+     * Load a single route file
+     */
+    private function loadRouteFile($file)
+    {
+        if (!file_exists($file)) {
+            return;
+        }
+
+        // Include the route file
+        // The file should use Router::get(), Router::post(), etc.
+        require_once $file;
     }
 
     /**
@@ -518,6 +578,12 @@ class Router
      */
     private function _route()
     {
+        // Discover routes on first route() call
+        if (!self::$routesDiscovered) {
+            $this->discoverRoutes();
+            self::$routesDiscovered = true;
+        }
+
         $requestMethod = $_SERVER['REQUEST_METHOD'];
         $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $requestUri = rtrim($requestUri, '/');
@@ -819,7 +885,7 @@ class Router
      */
     private function handleRouterError($e)
     {
-        if (defined('APP_DEBUG') && APP_DEBUG) {
+        if (app('debug') === true) {
             echo "<h1>Router Error</h1>";
             echo "<p><strong>Message:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
             echo "<p><strong>File:</strong> " . $e->getFile() . ":" . $e->getLine() . "</p>";
@@ -835,7 +901,7 @@ class Router
      */
     private function handleViewError($e, $viewFile, $params = [])
     {
-        if (defined('APP_DEBUG') && APP_DEBUG) {
+        if (app('debug') === true) {
             echo "<div style='background:#f8d7da;border:1px solid #f5c6cb;color:#721c24;padding:15px;margin:10px;border-radius:4px;'>";
             echo "<h3>Router View Error</h3>";
             echo "<p><strong>View:</strong> " . htmlspecialchars($viewFile) . "</p>";

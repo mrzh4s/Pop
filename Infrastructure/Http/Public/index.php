@@ -24,13 +24,9 @@ Framework\Bootstrap::boot();
 // Import Router class
 use Framework\Http\Router;
 
-// Middleware is auto-discovered from:
-// - Infrastructure/Http/Middleware (global middleware)
-// - Features/*/Middleware (feature-specific middleware)
-
-// Load route modules
-require_once ROOT_PATH . '/Infrastructure/Http/Routes/web.php';
-require_once ROOT_PATH . '/Infrastructure/Http/Routes/api.php';
+// Auto-discovery enabled:
+// - Middleware from Infrastructure/Http/Middleware and Features/*/Middleware
+// - Routes from Infrastructure/Http/Routes and Features/*/Routes
 
 // Execute router
 Router::route();
