@@ -137,13 +137,29 @@ csrf_field()                     // CSRF hidden input field
 
 ### Routing System
 
+**Route Auto-Discovery:**
+Routes are automatically discovered and loaded from:
+- `Infrastructure/Http/Routes/*.php` - Core/global routes (web.php, api.php, etc.)
+- `Features/*/Routes/*.php` - Feature-specific routes
+
+No manual route loading required in index.php!
+
 **Route Definition:**
 ```php
-// In Infrastructure/Http/Routes/web.php or api.php
+// In Infrastructure/Http/Routes/web.php, api.php, or Features/[Feature]/Routes/*.php
 use Framework\Http\Router;
 
 Router::get('/path', 'ControllerName@method', ['middleware'])->name('route.name');
 Router::post('/api/endpoint', 'ControllerName@action', ['auth']);
+```
+
+**Example Feature Routes:**
+```php
+// Features/Auth/Routes/auth.php
+use Framework\Http\Router;
+
+Router::get('/auth/login', 'LoginController@show', ['guest'])->name('auth.login');
+Router::post('/auth/login', 'LoginController@authenticate', ['guest']);
 ```
 
 **Built-in Middleware:**
@@ -153,9 +169,116 @@ Router::post('/api/endpoint', 'ControllerName@action', ['auth']);
 - `permission:permission.name` - Requires specific permission
 - `role:rolename` - Requires specific role
 
-**Controller Naming:**
-- Page controllers: `LoginPage`, `DashboardPage`, `MapPage`
-- Methods: `show()` for rendering, action names for POST handlers
+### Controller System
+
+**Auto-Discovery via PSR-4:**
+Controllers are automatically discovered through Composer's PSR-4 autoloading from:
+- `Infrastructure\Http\Controllers\` - Global/shared controllers
+- `Features\*\Controllers\` - Feature-specific controllers
+
+**Base Controller Class:**
+All controllers can extend `Framework\Http\Controller` for convenient request/response handling:
+
+```php
+<?php
+namespace Features\User\Controllers;
+
+use Framework\Http\Controller;
+
+class UserApiController extends Controller
+{
+    public function index(): void
+    {
+        // Access request data
+        $search = $this->input('search');
+        $filters = $this->only(['status', 'role']);
+
+        // Validate
+        $missing = $this->validate(['name', 'email']);
+        if (!empty($missing)) {
+            $this->validationError(['missing' => $missing]);
+        }
+
+        // Return responses
+        $this->success('Users retrieved', $users);      // API JSON
+        $this->inertia('Users/Index', ['users' => $users]); // Web Inertia
+        $this->view('users.index', ['users' => $users]);    // Web Blade
+    }
+}
+```
+
+**Hybrid Approach Supported:**
+- **Web Controllers**: Use `$this->view()` or `$this->inertia()` for HTML responses
+- **API Controllers**: Use `$this->success()`, `$this->error()`, `$this->json()` for JSON responses
+- **Mixed**: Same controller can handle both based on request type
+
+**Available Controller Methods:**
+
+*Request Methods:*
+- `$this->all()` - Get all request data
+- `$this->input($key, $default)` - Get specific input
+- `$this->only(['field1', 'field2'])` - Get specific fields
+- `$this->except(['field1'])` - Get all except specific fields
+- `$this->validate(['required', 'fields'])` - Validate required fields
+- `$this->has($key)` - Check if input exists
+- `$this->file($key)` - Get uploaded file
+- `$this->isJson()` - Check if JSON request
+- `$this->isApi()` - Check if API request
+
+*Response Methods:*
+- `$this->json($data, $code)` - Raw JSON response
+- `$this->success($message, $data, $code)` - Success JSON response
+- `$this->error($message, $code, $errors)` - Error JSON response
+- `$this->created($data, $message)` - 201 Created response
+- `$this->validationError($errors, $message)` - 422 Validation error
+- `$this->notFound($message)` - 404 Not found
+- `$this->unauthorized($message)` - 401 Unauthorized
+- `$this->forbidden($message)` - 403 Forbidden
+- `$this->view($view, $data)` - Render Blade view
+- `$this->inertia($component, $props)` - Render Inertia component
+- `$this->redirect($url)` - Redirect to URL
+- `$this->redirectToRoute($name, $params)` - Redirect to named route
+- `$this->download($filePath, $fileName)` - Send file download
+
+**Controller Examples:**
+
+1. **Infrastructure Controller (Global)**:
+```php
+// Infrastructure/Http/Controllers/DashboardController.php
+namespace Infrastructure\Http\Controllers;
+
+use Framework\Http\Controller;
+
+class DashboardController extends Controller {
+    public function show(): void {
+        $this->inertia('Dashboard', ['user' => session('user')]);
+    }
+}
+```
+
+2. **Feature Controller (API)**:
+```php
+// Features/User/Controllers/UserApiController.php
+namespace Features\User\Controllers;
+
+use Framework\Http\Controller;
+
+class UserApiController extends Controller {
+    public function index(): void {
+        $this->success('Users retrieved', $users);
+    }
+
+    public function store(): void {
+        $missing = $this->validate(['name', 'email']);
+        if (!empty($missing)) {
+            $this->validationError(['missing' => $missing]);
+        }
+
+        $data = $this->only(['name', 'email']);
+        $this->created($user, 'User created');
+    }
+}
+```
 
 ### Middleware System
 
@@ -304,15 +427,21 @@ can('*')                         // All authenticated users
    }
    ```
 
-3. **Add Routes** in Infrastructure/Http/Routes/:
+3. **Add Routes** (optional - create Features/YourFeature/Routes/):
    ```php
+   // Features/YourFeature/Routes/yourfeature.php
    use Framework\Http\Router;
 
    Router::get('/feature/action', 'ActionController@handle', ['auth'])
        ->name('feature.action');
    ```
 
-4. **Framework Auto-Discovery** handles the rest via PSR-4 autoloading
+   Alternatively, add routes to `Infrastructure/Http/Routes/web.php` for core routes.
+
+4. **Framework Auto-Discovery** handles the rest:
+   - Controllers via PSR-4 autoloading
+   - Routes from `Features/*/Routes/*.php` and `Infrastructure/Http/Routes/*.php`
+   - Middleware from `Features/*/Middleware/*.php` and `Infrastructure/Http/Middleware/*.php`
 
 ## Database Patterns
 
@@ -355,6 +484,8 @@ $stmt->execute([$userId]);
 
 ## Important Notes
 
+- **Routes are auto-discovered** - No need to manually load route files in index.php
+- **Middleware is auto-discovered** - Drop middleware classes in appropriate directories
 - **Migrations are automatic** - No need to run migration commands
 - **Helpers are global** - Available everywhere after bootstrap
 - **Routes use named routes** - Always use `route('name')` not hardcoded paths

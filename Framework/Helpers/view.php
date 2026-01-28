@@ -66,8 +66,8 @@ if (!function_exists('component')) {
 }
 
 // Layout functions
-if (!function_exists('extend')) {
-    function extend($layout) {
+if (!function_exists('layout')) {
+    function layout($layout) {
         Blade::getInstance()->extend($layout);
     }
 }
