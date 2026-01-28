@@ -1,8 +1,8 @@
 <?php
 namespace Features\Auth\Login;
 
-use Features\Auth\Login\Ports\UserRepositoryInterface;
-use Features\Auth\Shared\Domain\Exceptions\InvalidCredentialsException;
+use Features\Auth\Shared\Ports\UserRepositoryInterface;
+use Features\Auth\Shared\Exceptions\InvalidCredentialsException;
 
 class LoginHandler
 {
