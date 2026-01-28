@@ -8,7 +8,7 @@ use Framework\View\Blade;
  */
 if (!function_exists('view')) {
     function view($view, $data = []) {
-        if (class_exists('ViewEngine')) {
+        if (class_exists('Framework\View\Blade')) {
             global $currentView;
             $currentView = $view;
             try {
@@ -16,14 +16,14 @@ if (!function_exists('view')) {
                 return $engine->render($view, $data);
             } catch (Exception $e) {
                 if (defined('APP_DEBUG')) {
-                    return "ViewEngine Error: " . $e->getMessage();
+                    return "Blade Error: " . $e->getMessage();
                 }
-                
-                error_log("ViewEngine Error: " . $e->getMessage());
+
+                error_log("Blade Error: " . $e->getMessage());
                 return view_fallback($view, $data);
             }
         }
-        
+
         return view_fallback($view, $data);
     }
 }
@@ -218,7 +218,24 @@ if (!function_exists('css')) {
             $attrs .= ' ' . $key . '="' . htmlspecialchars($value) . '"';
         }
         
-        return '<link rel="stylesheet" href="' . $url . '"' . $attrs . ' />';
+        return '<link rel="stylesheet" href="' . $url . '" ' . $attrs . ' />';
+    }
+}
+
+if (!function_exists('font')) {
+    function font($path,$attributes = []) {
+        $url = $path = ltrim($path, '/');
+        
+        // Get app URL - DO NOT use rtrim here to preserve protocol
+        $url = app_url().'/assets/fonts/'.$path;
+        
+        // Build attributes string
+        $attrs = 'type="text/css"';
+        foreach ($attributes as $key => $value) {
+            $attrs .= ' ' . $key . '="' . htmlspecialchars($value) . '"';
+        }
+        
+        return '<link rel="stylesheet" href="' . $url . '" ' . $attrs . ' />';
     }
 }
 

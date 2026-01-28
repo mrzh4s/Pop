@@ -634,7 +634,7 @@ class Router
                     return $this->executeControllerOrPage($handler, $namedParams);
                 }
                 
-                // 2. Check for view shorthand: "auth.signin"
+                // 2. Check for view shorthand: "auth.login"
                 if (strpos($handler, '.') !== false) {
                     return $this->renderViewShorthand($handler, $namedParams);
                 }

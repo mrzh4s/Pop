@@ -160,7 +160,7 @@ function route_url($name, $parameters = []) {
     $baseUrl = app('app.url', '');
     
     if (substr($baseUrl, -1) === '/') {
-        $baseUrl = substr($baseUrl, 0, -1);
+        $baseUrl = substr($baseUrl, 0, length: -1);
     }
     
     // If route starts with /, prepend base URL
@@ -336,82 +336,6 @@ function validate_required($fields) {
         }
     }
     return $missing;
-}
-
-
-// ============== MIDDLEWARE FUNCTIONS ==============
-
-/**
- * Authentication Middleware
- * Checks if user is authenticated
- */
-function authMiddleware() {    
-    if (!session("authenticated")) {
-        // Save intended URL for redirect after login
-        session_set('security.intended_url', $_SERVER['REQUEST_URI']);
-        
-        // Check if this is an API request
-        $router = Router::getRouter();
-        if ($router && $router->isApiRequest()) {
-            http_response_code(401);
-            header('Content-Type: application/json');
-            json([
-                'message' => 'Authentication required',
-            ], 401);
-            return false;
-        } else {
-            redirect('auth.signin');
-            return false;
-        }
-    }
-    
-    // User is authenticated - continue
-    return true;
-}
-
-/**
- * Guest Middleware
- * Only allows unauthenticated users (for login/register pages)
- */
-function guestMiddleware() {
-    if (session("authenticated")) {
-        redirect('home');
-        return false;
-    }
-    
-    return true;
-}
-
-/**
- * Public Middleware
- * Allows all users (authenticated or not)
- */
-function publicMiddleware() {
-    return true;
-}
-
-/**
- * Admin Middleware
- * Only allows admin users
- */
-function adminMiddleware() {
-    // First check authentication
-    if (!authMiddleware()) {
-        return false;
-    }
-    
-    // Check if user is admin
-    if (session('user.role') !== 'admin') {
-        $router = Router::getRouter();
-        if ($router && $router->isApiRequest()) {
-            json(['message' => 'Admin access required'], 403);
-        } else {
-            redirect_to('/error/403');
-        }
-        return false;
-    }
-    
-    return true;
 }
 
 

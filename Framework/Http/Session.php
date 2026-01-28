@@ -132,7 +132,7 @@ class Session {
         $validate = $this->validateSecurity();
 
         if (!$validate) {
-            route('auth.signin');
+            route('login.show');
         }
     }
     

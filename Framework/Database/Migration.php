@@ -19,8 +19,9 @@ class Migration {
     private $migrationsTable = 'migrations';
 
     private function __construct() {
-        $this->db = DB::connection();
-        $this->migrationsPath = ROOT_PATH . '/database/migrations';
+        // Use default connection (main/PostgreSQL) instead of hardcoded 'app'
+        $this->db = DB::connection(); // This will use DB_DEFAULT from .env
+        $this->migrationsPath = ROOT_PATH . '/Infrastructure/Persistence/Migrations';
         $this->ensureMigrationsTable();
     }
 
@@ -33,15 +34,30 @@ class Migration {
 
     /**
      * Create migrations tracking table if it doesn't exist
+     * Supports both PostgreSQL and SQLite
      */
     private function ensureMigrationsTable() {
         try {
-            $sql = "CREATE TABLE IF NOT EXISTS {$this->migrationsTable} (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                migration VARCHAR(255) UNIQUE NOT NULL,
-                batch INTEGER NOT NULL,
-                executed_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            )";
+            // Detect database driver
+            $driver = $this->db->getAttribute(PDO::ATTR_DRIVER_NAME);
+
+            if ($driver === 'pgsql') {
+                // PostgreSQL syntax
+                $sql = "CREATE TABLE IF NOT EXISTS {$this->migrationsTable} (
+                    id SERIAL PRIMARY KEY,
+                    migration VARCHAR(255) UNIQUE NOT NULL,
+                    batch INTEGER NOT NULL,
+                    executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )";
+            } else {
+                // SQLite syntax
+                $sql = "CREATE TABLE IF NOT EXISTS {$this->migrationsTable} (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    migration VARCHAR(255) UNIQUE NOT NULL,
+                    batch INTEGER NOT NULL,
+                    executed_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )";
+            }
 
             $this->db->exec($sql);
         } catch (Exception $e) {
@@ -185,6 +201,9 @@ class Migration {
     private function getExecutedMigrations() {
         try {
             $stmt = $this->db->query("SELECT migration FROM {$this->migrationsTable} ORDER BY id");
+            if ($stmt === false) {
+                return [];
+            }
             $results = $stmt->fetchAll(PDO::FETCH_COLUMN);
             return $results ?: [];
         } catch (Exception $e) {
@@ -198,6 +217,9 @@ class Migration {
     private function getNextBatchNumber() {
         try {
             $stmt = $this->db->query("SELECT MAX(batch) FROM {$this->migrationsTable}");
+            if ($stmt === false) {
+                return 1;
+            }
             $maxBatch = $stmt->fetchColumn();
             return ($maxBatch ?? 0) + 1;
         } catch (Exception $e) {
@@ -296,6 +318,9 @@ class Migration {
     private function getLastBatch() {
         try {
             $stmt = $this->db->query("SELECT MAX(batch) FROM {$this->migrationsTable}");
+            if ($stmt === false) {
+                return null;
+            }
             return $stmt->fetchColumn();
         } catch (Exception $e) {
             return null;
@@ -346,7 +371,16 @@ class Migration {
                 return;
             }
 
-            $migration = self::getInstance();
+            // Try to get instance - may fail if DB driver not available
+            try {
+                $migration = self::getInstance();
+            } catch (Exception $e) {
+                error_log("Auto-migration error: " . $e->getMessage());
+                return;
+            } catch (\Throwable $e) {
+                error_log("Auto-migration error: " . $e->getMessage());
+                return;
+            }
 
             if ($migration->hasPending()) {
                 if (app_debug()) {
@@ -363,6 +397,8 @@ class Migration {
             }
 
         } catch (Exception $e) {
+            error_log("Auto-migration error: " . $e->getMessage());
+        } catch (\Throwable $e) {
             error_log("Auto-migration error: " . $e->getMessage());
         }
     }
