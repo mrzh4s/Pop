@@ -29,6 +29,7 @@ class Bootstrap {
         'session',       // Session helpers
         'cookie',        // Cookie helpers
         'security',      // Security helpers (CSRF, etc)
+        'validation',    // Validation helpers
         'connection',    // Database connection helpers
         'migration',     // Migration helpers
         'permission',    // Permission helpers

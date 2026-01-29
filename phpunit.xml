@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+         bootstrap="Tests/Bootstrap.php"
+         colors="true"
+         stopOnFailure="false"
+         cacheDirectory=".phpunit.cache">
+
+    <!-- Test Suites -->
+    <testsuites>
+        <testsuite name="Unit">
+            <directory suffix="Test.php">Tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory suffix="Test.php">Tests/Feature</directory>
+        </testsuite>
+    </testsuites>
+
+    <!-- Code Coverage -->
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">Framework</directory>
+            <directory suffix=".php">Features</directory>
+            <directory suffix=".php">Infrastructure</directory>
+        </include>
+        <exclude>
+            <directory>Framework/Helpers</directory>
+            <directory>vendor</directory>
+        </exclude>
+        <report>
+            <html outputDirectory="coverage-report"/>
+            <text outputFile="php://stdout" showUncoveredFiles="false"/>
+        </report>
+    </coverage>
+
+    <!-- PHP Settings -->
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_DEBUG" value="true"/>
+        <ini name="display_errors" value="1"/>
+        <ini name="error_reporting" value="-1"/>
+        <ini name="memory_limit" value="512M"/>
+    </php>
+</phpunit>
