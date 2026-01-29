@@ -55,13 +55,13 @@ We welcome contributions in the following areas:
 
 2. **Clone your fork**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/pop.git
-   cd pop
+   git clone https://github.com/YOUR_USERNAME/Pop.git
+   cd Pop
    ```
 
 3. **Add upstream remote**
    ```bash
-   git remote add upstream https://github.com/ORIGINAL_OWNER/pop.git
+   git remote add upstream https://github.com/mrzh4s/Pop.git
    ```
 
 4. **Install PHP dependencies**
@@ -336,7 +336,7 @@ Any other relevant information, logs, or screenshots.
 
 ### Where to Report
 
-- **GitHub Issues**: [https://github.com/YOUR_USERNAME/pop/issues](https://github.com/YOUR_USERNAME/pop/issues)
+- **GitHub Issues**: [https://github.com/mrzh4s/Pop/issues](https://github.com/mrzh4s/Pop/issues)
 
 ## Suggesting Enhancements
 

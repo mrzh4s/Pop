@@ -176,5 +176,5 @@ This is the initial stable release of Pop Framework. The framework provides a co
 
 ---
 
-[Unreleased]: https://github.com/YOUR_USERNAME/pop/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/YOUR_USERNAME/pop/releases/tag/v1.0.0
+[Unreleased]: https://github.com/mrzh4s/Pop/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/mrzh4s/Pop/releases/tag/v1.0.0

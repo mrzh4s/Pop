@@ -1,6 +1,7 @@
 # Dependencies
 /node_modules
 /vendor
+/docs
 
 # Build output
 /Infrastructure/Http/Public/assets
@@ -39,3 +40,4 @@ Thumbs.db
 
 # AI Files
 CLAUDE.md
+.claude

@@ -329,14 +329,12 @@ Built with modern PHP 8.4+ and inspired by Vertical Slice Architecture principle
 
 ## 📞 Support
 
-- **Issues:** [GitHub Issues](https://github.com/YOUR_USERNAME/pop/issues)
-- **Documentation:** [GitHub Repository](https://github.com/YOUR_USERNAME/pop)
+- **Issues:** [GitHub Issues](https://github.com/mrzh4s/Pop/issues)
+- **Documentation:** [GitHub Repository](https://github.com/mrzh4s/Pop)
 
 ---
 
 **Note:** Before publishing to production, make sure to:
-- Update `YOUR_USERNAME` and `YOUR_NAME` in `composer.json`
-- Update GitHub URLs in this README
 - Configure your production environment variables
 - Run the test suite
 - Review security settings
