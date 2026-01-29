@@ -1,5 +1,5 @@
 {
-    "name": "pop-framework/pop",
+    "name": "langkasuka/pop",
     "description": "Modern PHP framework implementing Vertical Slice Architecture with Inertia.js integration. Zero external dependencies, auto-discovery, and built-in RBAC.",
     "type": "project",
     "license": "MIT",

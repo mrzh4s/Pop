@@ -34,3 +34,7 @@ Thumbs.db
 # Cache
 /storage/cache/*
 !storage/cache/.gitkeep
+
+
+# AI Files
+CLAUDE.md
