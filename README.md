@@ -33,7 +33,7 @@ Pop Framework is a lightweight, modern PHP framework designed around **Vertical 
 Create a new project using Composer:
 
 ```bash
-composer create-project pop-framework/pop my-app
+composer create-project mrzh4s/pop-framework my-app
 cd my-app
 ```
 
