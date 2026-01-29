@@ -1,9 +1,21 @@
 {
     "name": "pop-framework/pop",
-    "description": "Pop Framework - VS Architecture Template",
+    "description": "Modern PHP framework implementing Vertical Slice Architecture with Inertia.js integration. Zero external dependencies, auto-discovery, and built-in RBAC.",
     "type": "project",
     "license": "MIT",
-    "keywords": ["php", "template", "minimal", "framework", "react", "vue", "svelte"],
+    "keywords": ["framework", "php", "vertical-slice", "vsa", "inertia", "react", "vue", "svelte", "minimal", "zero-dependency", "rbac"],
+    "homepage": "https://github.com/mrzh4s/pop",
+    "authors": [
+        {
+            "name": "mrzh4s",
+            "email": "mrzh4s@gmail.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/mrzh4s/pop/issues",
+        "source": "https://github.com/mrzh4s/pop",
+        "docs": "https://github.com/mrzh4s/pop#readme"
+    },
     "require": {
         "php": "^8.4"
     },
@@ -16,7 +28,24 @@
             "Infrastructure\\": "Infrastructure/",
             "Features\\": "Features/",
             "Config\\": "Config/"
-        }
+        },
+        "files": [
+            "Framework/Helpers/env.php",
+            "Framework/Helpers/config.php",
+            "Framework/Helpers/debug.php",
+            "Framework/Helpers/session.php",
+            "Framework/Helpers/cookie.php",
+            "Framework/Helpers/connection.php",
+            "Framework/Helpers/migration.php",
+            "Framework/Helpers/security.php",
+            "Framework/Helpers/permission.php",
+            "Framework/Helpers/activity.php",
+            "Framework/Helpers/traffic.php",
+            "Framework/Helpers/http.php",
+            "Framework/Helpers/router.php",
+            "Framework/Helpers/view.php",
+            "Framework/Helpers/inertia.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -25,30 +54,19 @@
     },
     "scripts": {
         "dev": "./run.sh",
-        "build": "yarn build"
+        "build": "npm run build",
+        "test": "vendor/bin/phpunit"
     },
-    "helpers": [
-        "Framework/Helpers/activity.php",
-        "Framework/Helpers/config.php",
-        "Framework/Helpers/connection.php",
-        "Framework/Helpers/cookie.php",
-        "Framework/Helpers/debug.php",
-        "Framework/Helpers/env.php",
-        "Framework/Helpers/http.php",
-        "Framework/Helpers/inertia.php",
-        "Framework/Helpers/migration.php",
-        "Framework/Helpers/permission.php",
-        "Framework/Helpers/router.php",
-        "Framework/Helpers/security.php",
-        "Framework/Helpers/session.php",
-        "Framework/Helpers/traffic.php",
-        "Framework/Helpers/view.php"
-    ],
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0-dev"
+        }
+    }
 }
