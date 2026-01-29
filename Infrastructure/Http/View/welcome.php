@@ -6,7 +6,7 @@
     <title>Welcome - Pop Framework</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
+<body class="bg-linear-to-br from-slate-50 to-slate-100 min-h-screen">
     <div class="container mx-auto px-4 py-16">
         <div class="max-w-4xl mx-auto">
             <!-- Header -->
@@ -18,7 +18,6 @@
                     Modern PHP with Vertical Slice Architecture
                 </p>
             </div>
-
             <!-- Feature Cards -->
             <div class="grid md:grid-cols-3 gap-6 mb-16">
                 <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">

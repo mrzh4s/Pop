@@ -11,14 +11,6 @@ use Framework\Http\Router;
 Router::get('/', 'WelcomeController@show', ['public'])->name('root');
 
 
-// ============== AUTHENTICATION ROUTES ==============
-Router::get('/auth/signin', 'LoginController@show', ['guest'])
-    ->name('auth.signin');
-
-Router::get('/auth/register', 'RegisterController@show', ['guest'])
-    ->name('auth.register');
-
-
 // ============== DASHBOARD ROUTES ==============
 Router::get('/dashboard', 'DashboardController@show', ['auth'])->name('dashboard');
 
