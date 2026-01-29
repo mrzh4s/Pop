@@ -4,7 +4,7 @@
     "type": "project",
     "license": "MIT",
     "keywords": ["framework", "php", "vertical-slice", "vsa", "inertia", "react", "vue", "svelte", "minimal", "zero-dependency", "rbac"],
-    "homepage": "https://github.com/mrzh4s/pop",
+    "homepage": "https://github.com/mrzh4s/Pop",
     "authors": [
         {
             "name": "mrzh4s",
@@ -12,9 +12,9 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/mrzh4s/pop/issues",
-        "source": "https://github.com/mrzh4s/pop",
-        "docs": "https://github.com/mrzh4s/pop#readme"
+        "issues": "https://github.com/mrzh4s/Pop/issues",
+        "source": "https://github.com/mrzh4s/Pop",
+        "docs": "https://github.com/mrzh4s/Pop#readme"
     },
     "require": {
         "php": "^8.4"
